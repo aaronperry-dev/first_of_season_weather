@@ -67,13 +67,13 @@
 
     // --- Helper Functions ---
 
-    // Function to convert Day of Year to MM-DD
-    function doyToMMDD(doy) {
-        var date = new Date(new Date().getFullYear(), 0); // initialize a date in `year-01-01`
-        var a = new Date(date.setDate(doy));
-        var mm = String(a.getMonth() + 1).padStart(2, '0');
-        var dd = String(a.getDate()).padStart(2, '0');
-        return `${mm}-${dd}`;
+    // Function to convert Day of Year to "Mon Day" format
+    function doyToMonthDay(doy) {
+        // Create a date for the current year at day 1, then set the date to the DOY
+        const date = new Date(new Date().getFullYear(), 0);
+        date.setDate(doy);
+        // Use toLocaleDateString for a nice format like "Sep 6"
+        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     }
 
     // Viridis color ramp
@@ -93,20 +93,20 @@
     // --- Function to create popup content ---
     function createPopupContent(properties, type) {
         let title = type === 'frost' ? "First Frost" : "First Hard Freeze";
-        let earliest = doyToMMDD(properties[type === 'frost' ? 'first_frost_earliest' : 'first_hard_freeze_earliest']);
-        let early = doyToMMDD(properties[type === 'frost' ? 'first_frost_early_10p' : 'first_hard_freeze_early_10p']);
-        let median = doyToMMDD(properties[type === 'frost' ? 'first_frost_median' : 'first_hard_freeze_median']);
-        let late = doyToMMDD(properties[type === 'frost' ? 'first_frost_late_90p' : 'first_hard_freeze_late_90p']);
-        let latest = doyToMMDD(properties[type === 'frost' ? 'first_frost_latest' : 'first_hard_freeze_latest']);
+        let earliest = doyToMonthDay(properties[type === 'frost' ? 'first_frost_earliest' : 'first_hard_freeze_earliest']);
+        let early = doyToMonthDay(properties[type === 'frost' ? 'first_frost_early_10p' : 'first_hard_freeze_early_10p']);
+        let median = doyToMonthDay(properties[type === 'frost' ? 'first_frost_median' : 'first_hard_freeze_median']);
+        let late = doyToMonthDay(properties[type === 'frost' ? 'first_frost_late_90p' : 'first_hard_freeze_late_90p']);
+        let latest = doyToMonthDay(properties[type === 'frost' ? 'first_frost_latest' : 'first_hard_freeze_latest']);
 
         return `<div class="info-popup">
                     <h4>${properties.COUNTYNAME}, ${properties.STATE}</h4>
-                    <p><strong>${title} Statistics:</strong></p>
-                    <p><strong>Earliest:</strong> ${earliest}</p>
-                    <p><strong>Early   :</strong> ${early}</p>
-                    <p><strong>Median  :</strong> ${median}</p>
-                    <p><strong>Late    :</strong> ${late}</p>
-                    <p><strong>Latest  :</strong> ${latest}</p>
+                    <p><strong>${title} Statistics</strong></p>
+                    <p><strong>Earliest (10th PCT):</strong> ${earliest}</p>
+                    <p><strong>Early    (25th PCT):</strong> ${early}</p>
+                    <p><strong>Median   (50th PCT):</strong> ${median}</p>
+                    <p><strong>Late     (90th PCT):</strong> ${late}</p>
+                    <p><strong>Latest   (99th PCT):</strong> ${latest}</p>
                 </div>`;
     }
 
@@ -119,7 +119,7 @@
                 style: function(feature) {
                     return {
                         fillColor: getColor(feature.properties.first_frost_median),
-                        weight: 2,
+                        weight: 1,
                         opacity: 1,
                         color: 'black',
                         dashArray: '0',
@@ -141,7 +141,7 @@
                 style: function(feature) {
                     return {
                         fillColor: getColor(feature.properties.first_hard_freeze_median),
-                        weight: 2,
+                        weight: 1,
                         opacity: 1,
                         color: 'black',
                         dashArray: '0',
@@ -174,7 +174,7 @@
         for (var i = 0; i < grades.length; i++) {
             div.innerHTML +=
                 '<i style="background:' + getColor(grades[i] + 1) + '"></i> ' +
-                doyToMMDD(grades[i]) + (grades[i + 1] ? '&ndash;' + doyToMMDD(grades[i + 1] - 1) + '<br>' : '+');
+                doyToMonthDay(grades[i]) + (grades[i + 1] ? '&ndash;' + doyToMonthDay(grades[i + 1] - 1) + '<br>' : '+');
         }
 
         return div;
