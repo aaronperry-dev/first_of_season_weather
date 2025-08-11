@@ -28,7 +28,7 @@
             background: white;
             padding: 10px;
             border-radius: 5px;
-            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3); /* Darker shadow for more opacity */
         }
         .info-popup h4 {
             margin: 0 0 5px 0;
@@ -62,7 +62,7 @@
         .layer-selector {
             position: absolute;
             top: 10px;
-            right: 10px;
+            right: 50px; /* Adjusted to make space for basemap control */
             z-index: 1000; /* Ensure it's above the map */
             background: white;
             padding: 5px 10px;
@@ -185,13 +185,27 @@
 
 
 <script>
+    // --- Basemap Definitions ---
+    var lightMap = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+    });
+
+    var darkMap = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+    });
+
+    var satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+	    attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+    });
+
     // Initialize the map, centered on New England
     var map = L.map('map', {
         center: [44.0, -70.0],
         zoom: 7,
         attributionControl: false, 
         tap: false, 
-        zoomAnimation: false 
+        zoomAnimation: false,
+        layers: [lightMap] // Set the default basemap
     });
 
     // --- Pane Management for Layering ---
@@ -200,13 +214,16 @@
     map.getPane('tooltipPane').style.zIndex = 700;
 
 
-    // Add a modern, clean base tile layer
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-        subdomains: 'abcd',
-        maxZoom: 20
-    }).addTo(map);
+    // Add Leaflet's default attribution control to the map
     L.control.attribution({prefix: false}).addTo(map);
+
+    // --- Basemap Control ---
+    var baseMaps = {
+        "Light": lightMap,
+        "Dark": darkMap,
+        "Satellite": satellite
+    };
+    L.control.layers(baseMaps).addTo(map);
 
 
     // --- Global variables for layers and data ---
@@ -356,18 +373,18 @@
 
     // --- City Data ---
     const cities = [
-        { name: "Bridgeport", state: "CT", coords: [41.1670, -73.2048], rank: 1 },
-        { name: "Stamford", state: "CT", coords: [41.0534, -73.5387], rank: 2 },
-        { name: "Portland", state: "ME", coords: [43.6615, -70.2553], rank: 1 },
-        { name: "Lewiston", state: "ME", coords: [44.1003, -70.2148], rank: 2 },
-        { name: "Boston", state: "MA", coords: [42.3601, -71.0589], rank: 1 },
-        { name: "Worcester", state: "MA", coords: [42.2626, -71.7981], rank: 2 },
-        { name: "Manchester", state: "NH", coords: [42.9956, -71.4548], rank: 1 },
-        { name: "Nashua", state: "NH", coords: [42.7654, -71.4676], rank: 2 },
-        { name: "Providence", state: "RI", coords: [41.8240, -71.4128], rank: 1 },
-        { name: "Cranston", state: "RI", coords: [41.7715, -71.4534], rank: 2 },
-        { name: "Burlington", state: "VT", coords: [44.4759, -73.2121], rank: 1 },
-        { name: "South Burlington", state: "VT", coords: [44.4684, -73.1732], rank: 2 }
+        { name: "Hartford", state: "CT", coords: [41.7658, -72.6734] },
+        { name: "Bridgeport", state: "CT", coords: [41.1670, -73.2048] },
+        { name: "Augusta", state: "ME", coords: [44.3106, -69.7794] },
+        { name: "Portland", state: "ME", coords: [43.6615, -70.2553] },
+        { name: "Boston", state: "MA", coords: [42.3601, -71.0589] },
+        { name: "Worcester", state: "MA", coords: [42.2626, -71.7981] },
+        { name: "Concord", state: "NH", coords: [43.2081, -71.5376] },
+        { name: "Manchester", state: "NH", coords: [42.9956, -71.4548] },
+        { name: "Providence", state: "RI", coords: [41.8240, -71.4128] },
+        { name: "Cranston", state: "RI", coords: [41.7715, -71.4534] },
+        { name: "Montpelier", state: "VT", coords: [44.2601, -72.5754] },
+        { name: "Burlington", state: "VT", coords: [44.4759, -73.2121] }
     ];
 
     // --- Create City Markers ---
@@ -425,7 +442,7 @@
                 fillColor: getColor(feature.properties.first_frost_median, frostMin, frostMax, frostColors),
                 weight: 1, opacity: 1, color: 'black', dashArray: '0', fillOpacity: 0.8
             }),
-            onEachFeature: (feature, layer) => layer.bindTooltip(createPopupContent(feature.properties, 'frost'))
+            onEachFeature: (feature, layer) => layer.bindTooltip(createPopupContent(feature.properties, 'frost'), {pane: 'tooltipPane'})
         });
 
         freezeLayer = L.geoJson(freezeData, {
@@ -433,7 +450,7 @@
                 fillColor: getColor(feature.properties.first_hard_freeze_median, freezeMin, freezeMax, freezeColors),
                 weight: 1, opacity: 1, color: 'black', dashArray: '0', fillOpacity: 0.8
             }),
-            onEachFeature: (feature, layer) => layer.bindTooltip(createPopupContent(feature.properties, 'freeze'))
+            onEachFeature: (feature, layer) => layer.bindTooltip(createPopupContent(feature.properties, 'freeze'), {pane: 'tooltipPane'})
         });
         
         chillLayer = L.geoJson(chillData, {
@@ -441,7 +458,7 @@
                 fillColor: getColor(feature.properties.first_foliage_chill_median, chillMin, chillMax, chillColors),
                 weight: 1, opacity: 1, color: 'black', dashArray: '0', fillOpacity: 0.8
             }),
-            onEachFeature: (feature, layer) => layer.bindTooltip(createPopupContent(feature.properties, 'chill'))
+            onEachFeature: (feature, layer) => layer.bindTooltip(createPopupContent(feature.properties, 'chill'), {pane: 'tooltipPane'})
         });
 
         chillLayer.addTo(map);
