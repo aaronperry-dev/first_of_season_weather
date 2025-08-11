@@ -4,7 +4,7 @@
     <title>New England Fall Weather Map: County-level First Chill, Frost & Hard Freeze Dates</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Explore an interactive map of New England showing the median dates for the first fall chill (≤40°F), first frost (≤32°F), and first hard freeze (≤29°F) by county.">
+    <meta name="description" content="Explore an interactive map of New England showing the median dates for the first fall chill (≤45°F), first frost (≤32°F), and first hard freeze (≤29°F) by county.">
     <meta name="keywords" content="New England, frost dates, hard freeze, fall chill, weather map, Leaflet map, meteorology, climatology, gardening, fall foliage, Massachusetts, Maine, Vermont, New Hampshire, Connecticut, Rhode Island">
     <meta name="author" content="Aaron Perry">
     <meta property="og:type" content="website">
@@ -86,6 +86,28 @@
             padding: 2px 5px;
             font-size: 11px;
         }
+        /* Style for the new description box */
+        #description-box {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 1000;
+            width: 280px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+        }
+        #description-box h4 {
+            margin: 0 0 5px 0;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #ccc;
+        }
+        #description-box p {
+            margin: 0;
+            font-size: 13px;
+            line-height: 1.4;
+        }
     </style>
 </head>
 <body>
@@ -101,6 +123,12 @@
         <option value="freeze">First Hard Freeze Dates</option>
     </select>
 </div>
+
+<!-- Description Box -->
+<div id="description-box">
+    <!-- Content will be dynamically inserted here -->
+</div>
+
 
 <!-- Custom Attribution -->
 <div class="attribution-credit">
@@ -130,7 +158,32 @@
     let frostData, freezeData, chillData;
     let currentLayer = 'chill'; // Keep track of the active layer
 
+    // --- Content for the Description Box ---
+    const layerDescriptions = {
+        chill: {
+            title: "First Fall Chill (MinT ≤45°F)",
+            text: "This layer shows the median date of the first day in autumn where the temperature drops to 45°F or below. This 'first chill' is often a key trigger for the start of vibrant fall foliage."
+        },
+        frost: {
+            title: "First Frost (MinT ≤32°F)",
+            text: "This layer displays the median date of the first frost, when temperatures reach 32°F or lower. This event typically marks the end of the growing season for more sensitive plants."
+        },
+        freeze: {
+            title: "First Hard Freeze (MinT ≤29°F)",
+            text: "This layer indicates the median date of the first 'hard freeze,' defined as temperatures reaching 29°F or lower. A hard freeze will end the growing season for most vegetation."
+        }
+    };
+
     // --- Helper Functions ---
+
+    // Function to update the description box content
+    function updateDescriptionBox(layerType) {
+        const descriptionBox = document.getElementById('description-box');
+        const content = layerDescriptions[layerType];
+        if (descriptionBox && content) {
+            descriptionBox.innerHTML = `<h4>${content.title}</h4><p>${content.text}</p>`;
+        }
+    }
 
     // Function to convert Day of Year to "Mon Day" format
     function doyToMonthDay(doy) {
@@ -290,9 +343,10 @@
             onEachFeature: (feature, layer) => layer.bindTooltip(createPopupContent(feature.properties, 'chill'))
         });
 
-        // Add initial layer and update legend
+        // Add initial layer and update legend and description
         chillLayer.addTo(map);
         legend.update('chill');
+        updateDescriptionBox('chill');
 
     }).catch(error => console.error("Failed to load map data:", error));
 
@@ -307,16 +361,19 @@
         if (map.hasLayer(chillLayer)) map.removeLayer(chillLayer);
         
 
-        // Add new layer and update legend
+        // Add new layer and update legend and description
         if (selectedLayer === 'frost') {
             map.addLayer(frostLayer);
             legend.update('frost');
+            updateDescriptionBox('frost');
         } else if (selectedLayer === 'freeze') {
             map.addLayer(freezeLayer);
             legend.update('freeze');
+            updateDescriptionBox('freeze');
         } else if (selectedLayer === 'chill') {
             map.addLayer(chillLayer);
             legend.update('chill');
+            updateDescriptionBox('chill');
         }
 
         currentLayer = selectedLayer;
