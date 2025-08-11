@@ -116,6 +116,15 @@
             line-height: 35px !important;
         }
 
+        /* Style for static city labels */
+        .city-label {
+            white-space: nowrap;
+            font-size: 12px;
+            font-weight: bold;
+            color: #000;
+            text-shadow: 0 0 3px #fff, 0 0 3px #fff, 0 0 3px #fff; /* White outline for readability */
+        }
+
         /* --- Mobile Optimization --- */
         @media (max-width: 768px) {
             #description-box {
@@ -185,10 +194,13 @@
         zoomAnimation: false // Can improve performance on older devices
     });
 
-    // Create a new pane for the city markers to ensure they are on top
+    // --- Pane Management for Layering ---
+    // Pane for cities to ensure they are on top of counties
     map.createPane('cityPane');
     map.getPane('cityPane').style.zIndex = 650;
-    map.getPane('cityPane').style.pointerEvents = 'none'; // Allow clicks to pass through to layers below
+    
+    // Pane for tooltips to ensure they are on top of everything
+    map.getPane('tooltipPane').style.zIndex = 700;
 
 
     // Add a modern, clean base tile layer
@@ -287,8 +299,8 @@
                     <h4>${properties.COUNTYNAME} County, ${properties.STATE}</h4>
                     <strong>${title} Statistics</strong>
                     <table>
-                        <tr><td><strong>Earliest (10th Percentile):</strong></td><td>${earliest}</td></tr>
-                        <tr><td><strong>Early&nbsp;&nbsp;&nbsp;(25th Percentile):</strong></td><td>${early}</td></tr>
+                        <tr><td><strong>Earliest&nbsp;(10th Percentile):</strong></td><td>${earliest}</td></tr>
+                        <tr><td><strong>Early&nbsp;&nbsp;&nbsp;&nbsp;(25th Percentile):</strong></td><td>${early}</td></tr>
                         <tr><td><strong>Median&nbsp;&nbsp;&nbsp;(50th Percentile):</strong></td><td>${median}</td></tr>
                         <tr><td><strong>Late&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(90th Percentile):</strong></td><td>${late}</td></tr>
                         <tr><td><strong>Latest&nbsp;&nbsp;&nbsp;(99th Percentile):</strong></td><td>${latest}</td></tr>
@@ -370,7 +382,8 @@
     var allCityMarkers = [];
 
     cities.forEach(city => {
-        var marker = L.circleMarker(city.coords, {
+        // Create the black circle marker
+        var circle = L.circleMarker(city.coords, {
             radius: 5,
             fillColor: "black",
             color: "#FFF",
@@ -378,23 +391,35 @@
             opacity: 1,
             fillOpacity: 0.8,
             pane: 'cityPane'
-        }).bindTooltip(city.name);
-        // Store the marker and its rank in an object
-        allCityMarkers.push({ marker: marker, rank: city.rank });
+        });
+
+        // Create the static text label
+        var label = L.marker(city.coords, {
+            icon: L.divIcon({
+                className: 'city-label',
+                html: `&nbsp;&nbsp;${city.name}`, // Add spacing
+                iconAnchor: [0, 8] // Anchor label to the side of the point
+            }),
+            pane: 'cityPane'
+        });
+        
+        // Group the circle and label together
+        var cityGroup = L.layerGroup([circle, label]);
+        allCityMarkers.push({ group: cityGroup, rank: city.rank });
     });
 
     function updateCityVisibility() {
         var currentZoom = map.getZoom();
-        cityMarkersLayer.clearLayers(); // Clear existing markers before adding new ones
+        cityMarkersLayer.clearLayers(); // Clear existing markers
 
         allCityMarkers.forEach(cityInfo => {
             // Show rank 1 cities at zoom 7 or higher
             if (cityInfo.rank === 1 && currentZoom >= 7) {
-                cityMarkersLayer.addLayer(cityInfo.marker);
+                cityMarkersLayer.addLayer(cityInfo.group);
             }
             // Show rank 2 cities only at zoom 8 or higher
             else if (cityInfo.rank === 2 && currentZoom >= 8) {
-                cityMarkersLayer.addLayer(cityInfo.marker);
+                cityMarkersLayer.addLayer(cityInfo.group);
             }
         });
     }
