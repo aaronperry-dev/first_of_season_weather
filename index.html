@@ -28,7 +28,7 @@
             background: white;
             padding: 10px;
             border-radius: 5px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3); /* Darker shadow for more opacity */
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
         }
         .info-popup h4 {
             margin: 0 0 5px 0;
@@ -58,12 +58,11 @@
             margin-right: 8px;
             opacity: 0.8;
         }
-        /* Style for the dropdown layer selector */
         .layer-selector {
             position: absolute;
             top: 10px;
-            right: 50px; /* Adjusted to make space for basemap control */
-            z-index: 1000; /* Ensure it's above the map */
+            right: 50px;
+            z-index: 1000;
             background: white;
             padding: 5px 10px;
             border-radius: 5px;
@@ -76,7 +75,6 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             font-weight: bold;
         }
-        /* Style for the attribution */
         .attribution-credit {
             position: absolute;
             bottom: 0;
@@ -86,7 +84,6 @@
             padding: 2px 5px;
             font-size: 11px;
         }
-        /* Style for the new description box */
         #description-box {
             position: absolute;
             top: 10px;
@@ -108,26 +105,27 @@
             font-size: 13px;
             line-height: 1.4;
         }
-        
-        /* Larger touch targets for zoom controls */
         .leaflet-bar a {
             height: 35px !important;
             width: 35px !important;
             line-height: 35px !important;
         }
-
-        /* Style for static city labels */
         .city-label {
             white-space: nowrap;
             font-size: 12px;
             font-weight: bold;
             color: #000;
-            text-shadow: 0 0 3px #fff, 0 0 3px #fff, 0 0 3px #fff; /* White outline for readability */
+            text-shadow: 0 0 3px #fff, 0 0 3px #fff, 0 0 3px #fff;
+        }
+        /* Style for the home button */
+        .leaflet-control-custom a {
+            font-size: 1.4em;
+            text-align: center;
+            cursor: pointer;
         }
 
-        /* --- Mobile Optimization --- */
         @media (max-width: 768px) {
-            #description-box {
+            #description-box, .layer-selector {
                 position: relative;
                 width: auto;
                 top: 0;
@@ -138,23 +136,8 @@
                 box-shadow: none;
                 border-bottom: 1px solid #ccc;
             }
-            .layer-selector {
-                position: relative;
-                width: auto;
-                top: 0;
-                right: 0;
-                left: 0;
-                z-index: 10;
-                border-radius: 0;
-                box-shadow: none;
-                border-bottom: 1px solid #ccc;
-                text-align: center;
-            }
-            .legend {
-                width: auto;
-                right: 10px;
-                left: 10px;
-            }
+            .layer-selector { text-align: center; }
+            .legend { width: auto; right: 10px; left: 10px; }
         }
     </style>
 </head>
@@ -162,7 +145,6 @@
 
 <div id="map"></div>
 
-<!-- Dropdown for layer selection -->
 <div class="layer-selector">
     <label for="layer-select"></label>
     <select id="layer-select">
@@ -172,13 +154,8 @@
     </select>
 </div>
 
-<!-- Description Box -->
-<div id="description-box">
-    <!-- Content will be dynamically inserted here -->
-</div>
+<div id="description-box"></div>
 
-
-<!-- Custom Attribution -->
 <div class="attribution-credit">
     Map and data compiled and created by Aaron Perry - Aug 2025
 </div>
@@ -187,233 +164,175 @@
 <script>
     // --- Basemap Definitions ---
     var lightMap = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+        attribution: '&copy; CARTO'
     });
-
     var darkMap = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+        attribution: '&copy; CARTO'
+    });
+    var terrainMap = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
+	    attribution: 'Tiles &copy; Esri'
     });
 
-    var satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-	    attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
-    });
-
-    // Initialize the map, centered on New England
+    // Initialize the map
     var map = L.map('map', {
         center: [44.0, -70.0],
         zoom: 7,
         attributionControl: false, 
         tap: false, 
         zoomAnimation: false,
-        layers: [lightMap] // Set the default basemap
+        layers: [lightMap]
     });
 
-    // --- Pane Management for Layering ---
+    // --- Pane Management ---
     map.createPane('cityPane');
     map.getPane('cityPane').style.zIndex = 650;
     map.getPane('tooltipPane').style.zIndex = 700;
 
-
-    // Add Leaflet's default attribution control to the map
+    // --- Controls ---
     L.control.attribution({prefix: false}).addTo(map);
-
-    // --- Basemap Control ---
-    var baseMaps = {
-        "Light": lightMap,
-        "Dark": darkMap,
-        "Satellite": satellite
-    };
+    L.control.scale({ imperial: true, metric: false }).addTo(map);
+    var baseMaps = { "Light": lightMap, "Dark": darkMap, "Terrain": terrainMap };
     L.control.layers(baseMaps).addTo(map);
 
+    // --- Home Button Control ---
+    L.Control.Custom = L.Control.extend({
+        onAdd: function(map) {
+            var container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
+            container.innerHTML = '<a href="#" title="Reset View">🏠</a>';
+            container.onclick = function(e) {
+                e.preventDefault();
+                map.setView([44.0, -70.0], 7);
+            }
+            return container;
+        },
+        onRemove: function(map) {}
+    });
+    new L.Control.Custom({ position: 'topleft' }).addTo(map);
 
-    // --- Global variables for layers and data ---
+    // --- Global Variables ---
     let frostLayer, freezeLayer, chillLayer;
     let frostData, freezeData, chillData;
     let currentLayer = 'chill';
+    let lastHoveredLayer = null;
 
     // --- Thematic Color Ramps ---
-    const chillColors = ['#ffffe5','#fff7bc','#fee391','#fec44f','#fe9929','#ec7014','#cc4c02','#993404','#662506'].reverse(); // YlOrBr
-    const frostColors = ['#ffffd9','#edf8b1','#c7e9b4','#7fcdbb','#41b6c4','#1d91c0','#225ea8','#253494','#081d58'].reverse(); // YlGnBu
-    const freezeColors = ['#f7fcfd','#e0ecf4','#bfd3e6','#9ebcda','#8c96c6','#8c6bb1','#88419d','#810f7c','#4d004b'].reverse(); // PuBu
+    const chillColors = ['#ffffe5','#fff7bc','#fee391','#fec44f','#fe9929','#ec7014','#cc4c02','#993404','#662506'].reverse();
+    const frostColors = ['#ffffd9','#edf8b1','#c7e9b4','#7fcdbb','#41b6c4','#1d91c0','#225ea8','#253494','#081d58'].reverse();
+    const freezeColors = ['#f7fcfd','#e0ecf4','#bfd3e6','#9ebcda','#8c96c6','#8c6bb1','#88419d','#810f7c','#4d004b'].reverse();
 
-    // --- Content for the Description Box ---
+    // --- Content Definitions ---
     const layerDescriptions = {
-        chill: {
-            title: "First Fall Chill",
-            text: "This layer shows the median date of the first day in autumn where the temperature drops to 45°F or below.<br><br><i>Note that actual dates can vary within a county due to factors like elevation, proximity to the ocean, and other local conditions.</i>"
-        },
-        frost: {
-            title: "First Frost",
-            text: "This layer displays the median date of the first frost, when temperatures reach 32°F or lower.<br><br><i>Note that actual dates can vary within a county due to factors like elevation, proximity to the ocean, and other local conditions.</i>"
-        },
-        freeze: {
-            title: "First Hard Freeze",
-            text: "This layer indicates the median date of the first 'hard freeze,' defined as temperatures reaching 29°F or lower.<br><br><i>Note that actual dates can vary within a county due to factors like elevation, proximity to the ocean, and other local conditions.</i>"
-        }
+        chill: { title: "First Fall Chill", text: "Median date of the first day where the temperature drops to 45°F or below.<br><br><i>Note: Actual dates can vary within a county due to elevation, proximity to the ocean, and other local conditions.</i>" },
+        frost: { title: "First Frost", text: "Median date of the first frost, when temperatures reach 32°F or lower.<br><br><i>Note: Actual dates can vary within a county due to elevation, proximity to the ocean, and other local conditions.</i>" },
+        freeze: { title: "First Hard Freeze", text: "Median date of the first 'hard freeze,' when temperatures reach 29°F or lower.<br><br><i>Note: Actual dates can vary within a county due to elevation, proximity to the ocean, and other local conditions.</i>" }
     };
 
     // --- Helper Functions ---
-
     function updateDescriptionBox(layerType) {
-        const descriptionBox = document.getElementById('description-box');
         const content = layerDescriptions[layerType];
-        if (descriptionBox && content) {
-            descriptionBox.innerHTML = `<h4>${content.title}</h4><p>${content.text}</p>`;
-        }
+        document.getElementById('description-box').innerHTML = `<h4>${content.title}</h4><p>${content.text}</p>`;
     }
 
     function doyToMonthDay(doy) {
-        if (doy === null || doy === undefined) return 'N/A';
+        if (doy == null) return 'N/A';
         const date = new Date(new Date().getFullYear(), 0);
         date.setDate(doy);
         return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     }
 
     function getColor(doy, minDoy, maxDoy, colors) {
-        if (doy === null || doy === undefined) return '#cccccc';
+        if (doy == null) return '#cccccc';
         const range = maxDoy - minDoy;
         if (range <= 0) return colors[0];
         const index = Math.min(Math.floor(((doy - minDoy) / range) * (colors.length - 1)), colors.length - 1);
         return colors[Math.max(0, index)] || '#cccccc';
     }
 
-    // --- Function to create popup content ---
     function createPopupContent(properties, type) {
         let title, earliest, early, median, late, latest;
-
         if (type === 'frost') {
             title = "First Frost (MinT &le;32&deg;F)";
-            earliest = doyToMonthDay(properties.first_frost_earliest);
-            early = doyToMonthDay(properties.first_frost_early_10p);
-            median = doyToMonthDay(properties.first_frost_median);
-            late = doyToMonthDay(properties.first_frost_late_90p);
-            latest = doyToMonthDay(properties.first_frost_latest);
+            [earliest, early, median, late, latest] = [properties.first_frost_earliest, properties.first_frost_early_10p, properties.first_frost_median, properties.first_frost_late_90p, properties.first_frost_latest];
         } else if (type === 'freeze') {
             title = "First Hard Freeze (MinT &le;29&deg;F)";
-            earliest = doyToMonthDay(properties.first_hard_freeze_earliest);
-            early = doyToMonthDay(properties.first_hard_freeze_early_10p);
-            median = doyToMonthDay(properties.first_hard_freeze_median);
-            late = doyToMonthDay(properties.first_hard_freeze_late_90p);
-            latest = doyToMonthDay(properties.first_hard_freeze_latest);
-        } else { // 'chill'
+            [earliest, early, median, late, latest] = [properties.first_hard_freeze_earliest, properties.first_hard_freeze_early_10p, properties.first_hard_freeze_median, properties.first_hard_freeze_late_90p, properties.first_hard_freeze_latest];
+        } else {
             title = "First Fall Chill (MinT &le;45&deg;F)";
-            earliest = doyToMonthDay(properties.first_foliage_chill_earliest);
-            early = doyToMonthDay(properties.first_foliage_chill_early_10p);
-            median = doyToMonthDay(properties.first_foliage_chill_median);
-            late = doyToMonthDay(properties.first_foliage_chill_late_90p);
-            latest = doyToMonthDay(properties.first_foliage_chill_latest);
+            [earliest, early, median, late, latest] = [properties.first_foliage_chill_earliest, properties.first_foliage_chill_early_10p, properties.first_foliage_chill_median, properties.first_foliage_chill_late_90p, properties.first_foliage_chill_latest];
         }
-
-
-        return `<div class="info-popup">
-                    <h4>${properties.COUNTYNAME} County, ${properties.STATE}</h4>
-                    <strong>${title} Statistics</strong>
-                    <table>
-                        <tr><td><strong>Earliest (10th Percentile):</strong></td><td>${earliest}</td></tr>
-                        <tr><td><strong>Early&nbsp;&nbsp;&nbsp;(25th Percentile):</strong></td><td>${early}</td></tr>
-                        <tr><td><strong>Median&nbsp;&nbsp;&nbsp;(50th Percentile):</strong></td><td>${median}</td></tr>
-                        <tr><td><strong>Late&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(90th Percentile):</strong></td><td>${late}</td></tr>
-                        <tr><td><strong>Latest&nbsp;&nbsp;&nbsp;(99th Percentile):</strong></td><td>${latest}</td></tr>
-                    </table>
-                </div>`;
+        return `<div class="info-popup"><h4>${properties.COUNTYNAME} County, ${properties.STATE}</h4><strong>${title} Statistics</strong><table>
+                    <tr><td><strong>Earliest (10th Percentile):</strong></td><td>${doyToMonthDay(earliest)}</td></tr>
+                    <tr><td><strong>Early&nbsp;&nbsp;&nbsp;(25th Percentile):</strong></td><td>${doyToMonthDay(early)}</td></tr>
+                    <tr><td><strong>Median&nbsp;&nbsp;&nbsp;(50th Percentile):</strong></td><td>${doyToMonthDay(median)}</td></tr>
+                    <tr><td><strong>Late&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(90th Percentile):</strong></td><td>${doyToMonthDay(late)}</td></tr>
+                    <tr><td><strong>Latest&nbsp;&nbsp;&nbsp;(99th Percentile):</strong></td><td>${doyToMonthDay(latest)}</td></tr>
+                </table></div>`;
     }
 
     // --- Legend Control ---
     var legend = L.control({position: 'bottomright'});
-    legend.onAdd = function (map) {
-        this._div = L.DomUtil.create('div', 'info legend');
-        this.update();
-        return this._div;
-    };
-    legend.update = function (layerType) {
+    legend.onAdd = function(map) { this._div = L.DomUtil.create('div', 'info legend'); this.update(); return this._div; };
+    legend.update = function(layerType) {
         let data, medianProperty, title, colors;
+        if (layerType === 'freeze') { [data, medianProperty, title, colors] = [freezeData, 'first_hard_freeze_median', 'Median Freeze Dates', freezeColors]; }
+        else if (layerType === 'frost') { [data, medianProperty, title, colors] = [frostData, 'first_frost_median', 'Median Frost Dates', frostColors]; }
+        else { [data, medianProperty, title, colors] = [chillData, 'first_foliage_chill_median', 'Median Fall Chill Dates', chillColors]; }
         
-        if (layerType === 'freeze') {
-            data = freezeData;
-            medianProperty = 'first_hard_freeze_median';
-            title = 'Median Freeze Dates';
-            colors = freezeColors;
-        } else if (layerType === 'frost') {
-            data = frostData;
-            medianProperty = 'first_frost_median';
-            title = 'Median Frost Dates';
-            colors = frostColors;
-        } else { // 'chill'
-            data = chillData;
-            medianProperty = 'first_foliage_chill_median';
-            title = 'Median Fall Chill Dates';
-            colors = chillColors;
-        }
-        
-        if (!data) {
-            this._div.innerHTML = '<strong>Median Dates</strong><br>Loading data...';
-            return;
-        }
+        if (!data) { this._div.innerHTML = '<strong>Median Dates</strong><br>Loading...'; return; }
 
         const medianValues = data.features.map(f => f.properties[medianProperty]).filter(v => v != null);
-        const minDoy = Math.min(...medianValues);
-        const maxDoy = Math.max(...medianValues);
-        
-        const grades = [];
-        const step = (maxDoy - minDoy) / 6;
-        for (let i = 0; i < 6; i++) {
-            grades.push(Math.round(minDoy + i * step));
-        }
+        const [minDoy, maxDoy] = [Math.min(...medianValues), Math.max(...medianValues)];
+        const grades = Array.from({length: 6}, (_, i) => Math.round(minDoy + i * (maxDoy - minDoy) / 6));
 
         let innerHTML = `<strong>${title}</strong><br>`;
-        for (var i = 0; i < grades.length; i++) {
-            const color = getColor(grades[i] + 1, minDoy, maxDoy, colors);
-            innerHTML +=
-                `<i style="background:${color}"></i> ` +
-                doyToMonthDay(grades[i]) + (grades[i + 1] ? '&ndash;' + doyToMonthDay(grades[i + 1] - 1) + '<br>' : '+');
-        }
+        grades.forEach((grade, i) => {
+            innerHTML += `<i style="background:${getColor(grade + 1, minDoy, maxDoy, colors)}"></i> ${doyToMonthDay(grade)}${(grades[i + 1] ? '&ndash;' + doyToMonthDay(grades[i + 1] - 1) + '<br>' : '+')}`;
+        });
         this._div.innerHTML = innerHTML;
     };
     legend.addTo(map);
 
-    // --- City Data ---
+    // --- City Data & Markers ---
     const cities = [
-        { name: "Hartford", state: "CT", coords: [41.7658, -72.6734] },
-        { name: "Bridgeport", state: "CT", coords: [41.1670, -73.2048] },
-        { name: "Augusta", state: "ME", coords: [44.3106, -69.7794] },
-        { name: "Portland", state: "ME", coords: [43.6615, -70.2553] },
-        { name: "Boston", state: "MA", coords: [42.3601, -71.0589] },
-        { name: "Worcester", state: "MA", coords: [42.2626, -71.7981] },
-        { name: "Concord", state: "NH", coords: [43.2081, -71.5376] },
-        { name: "Manchester", state: "NH", coords: [42.9956, -71.4548] },
-        { name: "Providence", state: "RI", coords: [41.8240, -71.4128] },
-        { name: "Cranston", state: "RI", coords: [41.7715, -71.4534] },
-        { name: "Montpelier", state: "VT", coords: [44.2601, -72.5754] },
-        { name: "Burlington", state: "VT", coords: [44.4759, -73.2121] }
+        { name: "Hartford", state: "CT", coords: [41.7658, -72.6734] }, { name: "Bridgeport", state: "CT", coords: [41.1670, -73.2048] },
+        { name: "Augusta", state: "ME", coords: [44.3106, -69.7794] }, { name: "Portland", state: "ME", coords: [43.6615, -70.2553] },
+        { name: "Boston", state: "MA", coords: [42.3601, -71.0589] }, { name: "Worcester", state: "MA", coords: [42.2626, -71.7981] },
+        { name: "Concord", state: "NH", coords: [43.2081, -71.5376] }, { name: "Manchester", state: "NH", coords: [42.9956, -71.4548] },
+        { name: "Providence", state: "RI", coords: [41.8240, -71.4128] }, { name: "Cranston", state: "RI", coords: [41.7715, -71.4534] },
+        { name: "Montpelier", state: "VT", coords: [44.2601, -72.5754] }, { name: "Burlington", state: "VT", coords: [44.4759, -73.2121] }
     ];
-
-    // --- Create City Markers ---
     var cityMarkersLayer = L.layerGroup();
     cities.forEach(city => {
-        var circle = L.circleMarker(city.coords, {
-            radius: 5,
-            fillColor: "black",
-            color: "#FFF",
-            weight: 1,
-            opacity: 1,
-            fillOpacity: 0.8,
-            pane: 'cityPane'
-        });
-
-        var label = L.marker(city.coords, {
-            icon: L.divIcon({
-                className: 'city-label',
-                html: `&nbsp;&nbsp;${city.name}`,
-                iconAnchor: [0, 8] 
-            }),
-            pane: 'cityPane'
-        });
-        
-        var cityGroup = L.layerGroup([circle, label]);
-        cityMarkersLayer.addLayer(cityGroup);
+        var circle = L.circleMarker(city.coords, { radius: 5, fillColor: "black", color: "#FFF", weight: 1, opacity: 1, fillOpacity: 0.8, pane: 'cityPane' });
+        var label = L.marker(city.coords, { icon: L.divIcon({ className: 'city-label', html: `&nbsp;&nbsp;${city.name}`, iconAnchor: [0, 8] }), pane: 'cityPane' });
+        cityMarkersLayer.addLayer(L.layerGroup([circle, label]));
     });
     cityMarkersLayer.addTo(map);
 
+    // --- GeoJSON Layer Events ---
+    function onEachFeature(feature, layer) {
+        // Bind the tooltip
+        let type = layer.options.dataType;
+        layer.bindTooltip(createPopupContent(feature.properties, type), {pane: 'tooltipPane'});
+
+        // Set hover events
+        layer.on({
+            mouseover: function(e) {
+                var layer = e.target;
+                layer.setStyle({ color: 'white', weight: 2.5 });
+                if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+                    layer.bringToFront();
+                }
+            },
+            mouseout: function(e) {
+                // This is tricky because each layer is its own GeoJSON object.
+                // We find which main layer this feature belongs to and reset its style.
+                if (currentLayer === 'chill') chillLayer.resetStyle(e.target);
+                if (currentLayer === 'frost') frostLayer.resetStyle(e.target);
+                if (currentLayer === 'freeze') freezeLayer.resetStyle(e.target);
+            }
+        });
+    }
 
     // --- Load GeoJSON data and initialize map ---
     Promise.all([
@@ -421,44 +340,28 @@
         fetch('./data/first_hardfreeze_climo_counties_neweng.geojson').then(res => res.json()),
         fetch('./data/first_fallchill_climo_counties_neweng.geojson').then(res => res.json())
     ]).then(([frostJson, freezeJson, chillJson]) => {
-        frostData = frostJson;
-        freezeData = freezeJson;
-        chillData = chillJson;
+        [frostData, freezeData, chillData] = [frostJson, freezeJson, chillJson];
 
         const frostMedianValues = frostData.features.map(f => f.properties.first_frost_median).filter(v => v != null);
-        const frostMin = Math.min(...frostMedianValues);
-        const frostMax = Math.max(...frostMedianValues);
+        const [frostMin, frostMax] = [Math.min(...frostMedianValues), Math.max(...frostMedianValues)];
 
         const freezeMedianValues = freezeData.features.map(f => f.properties.first_hard_freeze_median).filter(v => v != null);
-        const freezeMin = Math.min(...freezeMedianValues);
-        const freezeMax = Math.max(...freezeMedianValues);
+        const [freezeMin, freezeMax] = [Math.min(...freezeMedianValues), Math.max(...freezeMedianValues)];
         
         const chillMedianValues = chillData.features.map(f => f.properties.first_foliage_chill_median).filter(v => v != null);
-        const chillMin = Math.min(...chillMedianValues);
-        const chillMax = Math.max(...chillMedianValues);
+        const [chillMin, chillMax] = [Math.min(...chillMedianValues), Math.max(...chillMedianValues)];
 
-        frostLayer = L.geoJson(frostData, {
-            style: feature => ({
-                fillColor: getColor(feature.properties.first_frost_median, frostMin, frostMax, frostColors),
-                weight: 1, opacity: 1, color: 'black', dashArray: '0', fillOpacity: 0.8
-            }),
-            onEachFeature: (feature, layer) => layer.bindTooltip(createPopupContent(feature.properties, 'frost'), {pane: 'tooltipPane'})
-        });
-
-        freezeLayer = L.geoJson(freezeData, {
-            style: feature => ({
-                fillColor: getColor(feature.properties.first_hard_freeze_median, freezeMin, freezeMax, freezeColors),
-                weight: 1, opacity: 1, color: 'black', dashArray: '0', fillOpacity: 0.8
-            }),
-            onEachFeature: (feature, layer) => layer.bindTooltip(createPopupContent(feature.properties, 'freeze'), {pane: 'tooltipPane'})
-        });
-        
         chillLayer = L.geoJson(chillData, {
-            style: feature => ({
-                fillColor: getColor(feature.properties.first_foliage_chill_median, chillMin, chillMax, chillColors),
-                weight: 1, opacity: 1, color: 'black', dashArray: '0', fillOpacity: 0.8
-            }),
-            onEachFeature: (feature, layer) => layer.bindTooltip(createPopupContent(feature.properties, 'chill'), {pane: 'tooltipPane'})
+            style: f => ({ fillColor: getColor(f.properties.first_foliage_chill_median, chillMin, chillMax, chillColors), weight: 1, opacity: 1, color: 'black', fillOpacity: 0.8 }),
+            onEachFeature: onEachFeature, dataType: 'chill'
+        });
+        frostLayer = L.geoJson(frostData, {
+            style: f => ({ fillColor: getColor(f.properties.first_frost_median, frostMin, frostMax, frostColors), weight: 1, opacity: 1, color: 'black', fillOpacity: 0.8 }),
+            onEachFeature: onEachFeature, dataType: 'frost'
+        });
+        freezeLayer = L.geoJson(freezeData, {
+            style: f => ({ fillColor: getColor(f.properties.first_hard_freeze_median, freezeMin, freezeMax, freezeColors), weight: 1, opacity: 1, color: 'black', fillOpacity: 0.8 }),
+            onEachFeature: onEachFeature, dataType: 'freeze'
         });
 
         chillLayer.addTo(map);
@@ -467,32 +370,20 @@
 
     }).catch(error => console.error("Failed to load map data:", error));
 
-
-    // --- Event Listener for the dropdown ---
+    // --- Dropdown Event Listener ---
     document.getElementById('layer-select').addEventListener('change', function(e) {
-        const selectedLayer = e.target.value;
-
+        currentLayer = e.target.value;
         if (map.hasLayer(frostLayer)) map.removeLayer(frostLayer);
         if (map.hasLayer(freezeLayer)) map.removeLayer(freezeLayer);
         if (map.hasLayer(chillLayer)) map.removeLayer(chillLayer);
         
-        if (selectedLayer === 'frost') {
-            map.addLayer(frostLayer);
-            legend.update('frost');
-            updateDescriptionBox('frost');
-        } else if (selectedLayer === 'freeze') {
-            map.addLayer(freezeLayer);
-            legend.update('freeze');
-            updateDescriptionBox('freeze');
-        } else if (selectedLayer === 'chill') {
-            map.addLayer(chillLayer);
-            legend.update('chill');
-            updateDescriptionBox('chill');
-        }
-
-        currentLayer = selectedLayer;
+        if (currentLayer === 'frost') map.addLayer(frostLayer);
+        else if (currentLayer === 'freeze') map.addLayer(freezeLayer);
+        else map.addLayer(chillLayer);
+        
+        legend.update(currentLayer);
+        updateDescriptionBox(currentLayer);
     });
-
 </script>
 
 </body>
