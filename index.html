@@ -177,7 +177,7 @@
         const medianProperty = layerType === 'freeze' ? 'first_hard_freeze_median' : 'first_frost_median';
         
         if (!data) {
-            this._div.innerHTML = '<strong>Median Date</strong><br>Loading...';
+            this._div.innerHTML = '<strong>Median Dates</strong><br>Loading...';
             return;
         }
 
@@ -191,7 +191,7 @@
             grades.push(Math.round(minDoy + i * step));
         }
 
-        let innerHTML = `<strong>Median ${layerType === 'freeze' ? 'Freeze' : 'Frost'} Date</strong><br>`;
+        let innerHTML = `<strong>Median ${layerType === 'freeze' ? 'Freeze' : 'Frost'} Dates</strong><br>`;
         for (var i = 0; i < grades.length; i++) {
             const color = getColor(grades[i] + 1, minDoy, maxDoy);
             innerHTML +=
