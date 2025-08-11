@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>New England Frost/Freeze Data</title>
+    <title>New England Frost/Freeze Data with Viridis Color Ramp</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
@@ -32,6 +32,22 @@
             font-size: 0.9em;
             color: #555;
         }
+        .legend {
+            line-height: 18px;
+            color: #555;
+            background: rgba(255,255,255,0.8);
+            padding: 6px 8px;
+            font-size: 14px;
+            border-radius: 5px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+        }
+        .legend i {
+            width: 18px;
+            height: 18px;
+            float: left;
+            margin-right: 8px;
+            opacity: 0.7;
+        }
     </style>
 </head>
 <body>
@@ -49,18 +65,43 @@
         maxZoom: 20
     }).addTo(map);
 
+    // --- Helper Functions ---
+
+    // Function to convert Day of Year to MM-DD
+    function doyToMMDD(doy) {
+        var date = new Date(new Date().getFullYear(), 0); // initialize a date in `year-01-01`
+        var a = new Date(date.setDate(doy));
+        var mm = String(a.getMonth() + 1).padStart(2, '0');
+        var dd = String(a.getDate()).padStart(2, '0');
+        return `${mm}-${dd}`;
+    }
+
+    // Viridis color ramp
+    const viridis = ['#440154', '#482878', '#3e4989', '#31688e', '#26828e', '#1f9e89', '#35b779', '#6ece58', '#b5de2b', '#fde725'];
+
+    // Function to get color from Viridis ramp based on DOY
+    function getColor(doy) {
+        // Simple mapping from DOY to Viridis colors.
+        // Adjust the min/max values based on your data's range for better color distribution.
+        const minDoy = 240; // Approx. late August
+        const maxDoy = 320; // Approx. mid-November
+        const range = maxDoy - minDoy;
+        const index = Math.min(Math.floor(((doy - minDoy) / range) * (viridis.length -1)), viridis.length -1);
+        return viridis[Math.max(0,index)] || '#cccccc'; // Default color if out of range
+    }
+
     // --- Function to create popup content ---
     function createPopupContent(properties, type) {
         let title = type === 'frost' ? "First Frost" : "First Hard Freeze";
-        let earliest = properties[type === 'frost' ? 'first_frost_earliest' : 'first_hard_freeze_earliest'];
-        let early = properties[type === 'frost' ? 'first_frost_early_10p' : 'first_hard_freeze_early_10p'];
-        let median = properties[type === 'frost' ? 'first_frost_median' : 'first_hard_freeze_median'];
-        let late = properties[type === 'frost' ? 'first_frost_late_90p' : 'first_hard_freeze_late_90p'];
-        let latest = properties[type === 'frost' ? 'first_frost_latest' : 'first_hard_freeze_latest'];
+        let earliest = doyToMMDD(properties[type === 'frost' ? 'first_frost_earliest' : 'first_hard_freeze_earliest']);
+        let early = doyToMMDD(properties[type === 'frost' ? 'first_frost_early_10p' : 'first_hard_freeze_early_10p']);
+        let median = doyToMMDD(properties[type === 'frost' ? 'first_frost_median' : 'first_hard_freeze_median']);
+        let late = doyToMMDD(properties[type === 'frost' ? 'first_frost_late_90p' : 'first_hard_freeze_late_90p']);
+        let latest = doyToMMDD(properties[type === 'frost' ? 'first_frost_latest' : 'first_hard_freeze_latest']);
 
         return `<div class="info-popup">
                     <h4>${properties.COUNTYNAME}, ${properties.STATE}</h4>
-                    <p><strong>${title} Statistics (Day of Year):</strong></p>
+                    <p><strong>${title} Statistics:</strong></p>
                     <p><strong>Earliest:</strong> ${earliest}</p>
                     <p><strong>Early (10%):</strong> ${early}</p>
                     <p><strong>Median:</strong> ${median}</p>
@@ -69,23 +110,26 @@
                 </div>`;
     }
 
-
     // --- Load GeoJSON data ---
     // Fetch First Frost Data
     fetch('first_frost_climo_counties_neweng.geojson')
         .then(response => response.json())
         .then(data => {
             var frostLayer = L.geoJson(data, {
-                style: {
-                    color: "#007bff", // Blue for frost
-                    weight: 2,
-                    opacity: 0.7
+                style: function(feature) {
+                    return {
+                        fillColor: getColor(feature.properties.first_frost_median),
+                        weight: 2,
+                        opacity: 1,
+                        color: 'white',
+                        dashArray: '3',
+                        fillOpacity: 0.7
+                    };
                 },
                 onEachFeature: function (feature, layer) {
                     layer.bindTooltip(createPopupContent(feature.properties, 'frost'));
                 }
             }).addTo(map); // Add frost layer by default
-             // Add to layer control
             controlLayers.addOverlay(frostLayer, "First Frost");
         });
 
@@ -94,24 +138,49 @@
         .then(response => response.json())
         .then(data => {
             var freezeLayer = L.geoJson(data, {
-                 style: {
-                    color: "#dc3545", // Red for hard freeze
-                    weight: 2,
-                    opacity: 0.7
+                style: function(feature) {
+                    return {
+                        fillColor: getColor(feature.properties.first_hard_freeze_median),
+                        weight: 2,
+                        opacity: 1,
+                        color: 'white',
+                        dashArray: '3',
+                        fillOpacity: 0.7
+                    };
                 },
                 onEachFeature: function (feature, layer) {
                     layer.bindTooltip(createPopupContent(feature.properties, 'freeze'));
                 }
             });
-             // Add to layer control
             controlLayers.addOverlay(freezeLayer, "First Hard Freeze");
         });
 
-    // Layer control
-    var baseLayers = {};
+
+    // --- Layer control ---
+    var baseLayers = {}; // No base layers in this control
     var overlayLayers = {};
     var controlLayers = L.control.layers(baseLayers, overlayLayers).addTo(map);
 
+    // --- Legend ---
+    var legend = L.control({position: 'bottomright'});
+
+    legend.onAdd = function (map) {
+        var div = L.DomUtil.create('div', 'info legend'),
+            grades = [240, 260, 280, 300, 320], // DOY values for legend
+            labels = [];
+
+        div.innerHTML += '<strong>Median Date</strong><br>';
+        // loop through our density intervals and generate a label with a colored square for each interval
+        for (var i = 0; i < grades.length; i++) {
+            div.innerHTML +=
+                '<i style="background:' + getColor(grades[i] + 1) + '"></i> ' +
+                doyToMMDD(grades[i]) + (grades[i + 1] ? '&ndash;' + doyToMMDD(grades[i + 1] - 1) + '<br>' : '+');
+        }
+
+        return div;
+    };
+
+    legend.addTo(map);
 
 </script>
 
