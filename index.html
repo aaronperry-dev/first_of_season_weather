@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>First Frost/Freeze Dates (per County) in New England</title>
+    <title>First Frost/Hard Freeze Dates (per County) in New England</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
@@ -10,6 +10,7 @@
         html, body {
             height: 100%;
             margin: 0;
+            padding: 0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         #map {
@@ -51,15 +52,61 @@
             margin-right: 8px;
             opacity: 0.7;
         }
+        /* Style for the dropdown layer selector */
+        .layer-selector {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 1000; /* Ensure it's above the map */
+            background: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+        }
+        .layer-selector select {
+            border: none;
+            background: transparent;
+            font-size: 16px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        /* Style for the attribution */
+        .attribution-credit {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.7);
+            padding: 2px 5px;
+            font-size: 11px;
+        }
     </style>
 </head>
 <body>
 
 <div id="map"></div>
 
+<!-- Dropdown for layer selection -->
+<div class="layer-selector">
+    <label for="layer-select">Dataset: </label>
+    <select id="layer-select">
+        <option value="frost">First Frost</option>
+        <option value="freeze">First Hard Freeze</option>
+    </select>
+</div>
+
+<!-- Custom Attribution -->
+<div class="attribution-credit">
+    Map and datasets compiled by Aaron Perry - Aug 2025
+</div>
+
+
 <script>
     // Initialize the map, centered on New England
-    var map = L.map('map').setView([44.0, -70.0], 6.1);
+    var map = L.map('map', {
+        center: [44.0, -70.0],
+        zoom: 6.1,
+        attributionControl: false // Disable default attribution to use custom one
+    });
 
     // Add a modern, clean base tile layer
     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
@@ -67,30 +114,33 @@
         subdomains: 'abcd',
         maxZoom: 20
     }).addTo(map);
+    L.control.attribution({prefix: false}).addTo(map);
+
+
+    // --- Global variables for layers and data ---
+    let frostLayer, freezeLayer;
+    let frostData, freezeData;
+    let currentLayer = 'frost'; // Keep track of the active layer
 
     // --- Helper Functions ---
 
     // Function to convert Day of Year to "Mon Day" format
     function doyToMonthDay(doy) {
-        // Create a date for the current year at day 1, then set the date to the DOY
         const date = new Date(new Date().getFullYear(), 0);
         date.setDate(doy);
-        // Use toLocaleDateString for a nice format like "Sep 6"
         return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     }
 
     // Viridis color ramp
     const viridis = ['#440154', '#482878', '#3e4989', '#31688e', '#26828e', '#1f9e89', '#35b779', '#6ece58', '#b5de2b', '#fde725'];
 
-    // Function to get color from Viridis ramp based on DOY
-    function getColor(doy) {
-        // Simple mapping from DOY to Viridis colors.
-        // Adjust the min/max values based on your data's range for better color distribution.
-        const minDoy = 240; // Approx. late August
-        const maxDoy = 320; // Approx. mid-November
+    // Function to get color from Viridis ramp based on DOY and the data's range
+    function getColor(doy, minDoy, maxDoy) {
+        if (doy === null || doy === undefined) return '#cccccc'; // Handle missing data
         const range = maxDoy - minDoy;
-        const index = Math.min(Math.floor(((doy - minDoy) / range) * (viridis.length -1)), viridis.length -1);
-        return viridis[Math.max(0,index)] || '#cccccc'; // Default color if out of range
+        if (range <= 0) return viridis[0];
+        const index = Math.min(Math.floor(((doy - minDoy) / range) * (viridis.length - 1)), viridis.length - 1);
+        return viridis[Math.max(0, index)] || '#cccccc';
     }
 
     // --- Function to create popup content ---
@@ -115,77 +165,105 @@
                 </div>`;
     }
 
-    // --- Load GeoJSON data ---
-    // Fetch First Frost Data
-    fetch('first_frost_climo_counties_neweng.geojson')
-        .then(response => response.json())
-        .then(data => {
-            var frostLayer = L.geoJson(data, {
-                style: function(feature) {
-                    return {
-                        fillColor: getColor(feature.properties.first_frost_median),
-                        weight: 1,
-                        opacity: 1,
-                        color: 'black',
-                        dashArray: '0',
-                        fillOpacity: 0.7
-                    };
-                },
-                onEachFeature: function (feature, layer) {
-                    layer.bindTooltip(createPopupContent(feature.properties, 'frost'));
-                }
-            }).addTo(map); // Add frost layer by default
-            controlLayers.addOverlay(frostLayer, "First Frost");
-        });
-
-    // Fetch First Hard Freeze Data
-    fetch('first_hardfreeze_climo_counties_neweng.geojson')
-        .then(response => response.json())
-        .then(data => {
-            var freezeLayer = L.geoJson(data, {
-                style: function(feature) {
-                    return {
-                        fillColor: getColor(feature.properties.first_hard_freeze_median),
-                        weight: 1,
-                        opacity: 1,
-                        color: 'black',
-                        dashArray: '0',
-                        fillOpacity: 0.7
-                    };
-                },
-                onEachFeature: function (feature, layer) {
-                    layer.bindTooltip(createPopupContent(feature.properties, 'freeze'));
-                }
-            });
-            controlLayers.addOverlay(freezeLayer, "First Hard Freeze");
-        });
-
-
-    // --- Layer control ---
-    var baseLayers = {}; // No base layers in this control
-    var overlayLayers = {};
-    var controlLayers = L.control.layers(baseLayers, overlayLayers).addTo(map);
-
-    // --- Legend ---
+    // --- Legend Control ---
     var legend = L.control({position: 'bottomright'});
-
     legend.onAdd = function (map) {
-        var div = L.DomUtil.create('div', 'info legend'),
-            grades = [240, 260, 280, 300, 320], // DOY values for legend
-            labels = [];
-
-        div.innerHTML += '<strong>Median Date</strong><br>';
-        // loop through our density intervals and generate a label with a colored square for each interval
-        for (var i = 0; i < grades.length; i++) {
-            div.innerHTML +=
-                '<i style="background:' + getColor(grades[i] + 1) + '"></i> ' +
-                doyToMonthDay(grades[i]) + (grades[i + 1] ? ' to ' + doyToMonthDay(grades[i + 1] - 1) + '<br>' : '+');
+        this._div = L.DomUtil.create('div', 'info legend');
+        this.update();
+        return this._div;
+    };
+    legend.update = function (layerType) {
+        const data = layerType === 'freeze' ? freezeData : frostData;
+        const medianProperty = layerType === 'freeze' ? 'first_hard_freeze_median' : 'first_frost_median';
+        
+        if (!data) {
+            this._div.innerHTML = '<strong>Median Date</strong><br>Loading...';
+            return;
         }
 
-        return div;
-    };
+        const medianValues = data.features.map(f => f.properties[medianProperty]).filter(v => v != null);
+        const minDoy = Math.min(...medianValues);
+        const maxDoy = Math.max(...medianValues);
+        
+        const grades = [];
+        const step = (maxDoy - minDoy) / 5;
+        for (let i = 0; i < 5; i++) {
+            grades.push(Math.round(minDoy + i * step));
+        }
 
+        let innerHTML = `<strong>Median ${layerType === 'freeze' ? 'Freeze' : 'Frost'} Date</strong><br>`;
+        for (var i = 0; i < grades.length; i++) {
+            const color = getColor(grades[i] + 1, minDoy, maxDoy);
+            innerHTML +=
+                `<i style="background:${color}"></i> ` +
+                doyToMonthDay(grades[i]) + (grades[i + 1] ? '&ndash;' + doyToMonthDay(grades[i + 1] - 1) + '<br>' : '+');
+        }
+        this._div.innerHTML = innerHTML;
+    };
     legend.addTo(map);
+
+
+    // --- Load GeoJSON data and initialize map ---
+    Promise.all([
+        fetch('first_frost_climo_counties_neweng.geojson').then(res => res.json()),
+        fetch('first_hardfreeze_climo_counties_neweng.geojson').then(res => res.json())
+    ]).then(([frostJson, freezeJson]) => {
+        frostData = frostJson;
+        freezeData = freezeJson;
+
+        const frostMedianValues = frostData.features.map(f => f.properties.first_frost_median).filter(v => v != null);
+        const frostMin = Math.min(...frostMedianValues);
+        const frostMax = Math.max(...frostMedianValues);
+
+        const freezeMedianValues = freezeData.features.map(f => f.properties.first_hard_freeze_median).filter(v => v != null);
+        const freezeMin = Math.min(...freezeMedianValues);
+        const freezeMax = Math.max(...freezeMedianValues);
+
+        frostLayer = L.geoJson(frostData, {
+            style: feature => ({
+                fillColor: getColor(feature.properties.first_frost_median, frostMin, frostMax),
+                weight: 1, opacity: 1, color: 'black', dashArray: '0', fillOpacity: 0.7
+            }),
+            onEachFeature: (feature, layer) => layer.bindTooltip(createPopupContent(feature.properties, 'frost'))
+        });
+
+        freezeLayer = L.geoJson(freezeData, {
+            style: feature => ({
+                fillColor: getColor(feature.properties.first_hard_freeze_median, freezeMin, freezeMax),
+                weight: 1, opacity: 1, color: 'black', dashArray: '0', fillOpacity: 0.7
+            }),
+            onEachFeature: (feature, layer) => layer.bindTooltip(createPopupContent(feature.properties, 'freeze'))
+        });
+
+        // Add initial layer and update legend
+        frostLayer.addTo(map);
+        legend.update('frost');
+
+    }).catch(error => console.error("Failed to load map data:", error));
+
+
+    // --- Event Listener for the dropdown ---
+    document.getElementById('layer-select').addEventListener('change', function(e) {
+        const selectedLayer = e.target.value;
+
+        // Remove current layer
+        if (currentLayer === 'frost' && map.hasLayer(frostLayer)) {
+            map.removeLayer(frostLayer);
+        } else if (currentLayer === 'freeze' && map.hasLayer(freezeLayer)) {
+            map.removeLayer(freezeLayer);
+        }
+
+        // Add new layer and update legend
+        if (selectedLayer === 'frost') {
+            map.addLayer(frostLayer);
+            legend.update('frost');
+        } else if (selectedLayer === 'freeze') {
+            map.addLayer(freezeLayer);
+            legend.update('freeze');
+        }
+
+        currentLayer = selectedLayer;
+    });
 
 </script>
 
