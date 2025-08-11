@@ -240,9 +240,9 @@
 
     // --- Load GeoJSON data and initialize map ---
     Promise.all([
-        fetch('first_frost_climo_counties_neweng.geojson').then(res => res.json()),
-        fetch('first_hardfreeze_climo_counties_neweng.geojson').then(res => res.json()),
-        fetch('first_fallchill_climo_counties_neweng.geojson').then(res => res.json())
+        fetch('/data/first_frost_climo_counties_neweng.geojson').then(res => res.json()),
+        fetch('/data/first_hardfreeze_climo_counties_neweng.geojson').then(res => res.json()),
+        fetch('/data/first_fallchill_climo_counties_neweng.geojson').then(res => res.json())
     ]).then(([frostJson, freezeJson, chillJson]) => {
         frostData = frostJson;
         freezeData = freezeJson;
