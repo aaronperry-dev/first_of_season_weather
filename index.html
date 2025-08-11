@@ -60,7 +60,7 @@
         }
         .layer-selector {
             position: absolute;
-            top: 50px; /* Pushed down below basemap selector */
+            top: 10px;
             right: 10px;
             z-index: 1000;
             background: white;
@@ -77,8 +77,8 @@
         }
         .attribution-credit {
             position: absolute;
-            bottom: 5px; /* Adjusted for spacing */
-            right: 10px; /* Moved to the right */
+            bottom: 5px;
+            left: 90px; /* Position next to scale bar */
             z-index: 1000;
             background: rgba(255, 255, 255, 0.9);
             padding: 2px 5px;
@@ -86,7 +86,7 @@
         }
         #description-box {
             position: absolute;
-            top: 90px; /* Pushed down below zoom/home controls */
+            top: 10px;
             left: 10px;
             z-index: 1000;
             width: 280px;
@@ -122,14 +122,10 @@
             text-align: center;
             cursor: pointer;
         }
-        /* Spacing for bottom-left controls */
-        .leaflet-bottom.leaflet-left {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-        }
-        .leaflet-control-scale {
-            margin-bottom: 5px; /* Space between scale and attribution */
+        
+        /* Reposition basemap control below data layer dropdown */
+        .leaflet-top.leaflet-right .leaflet-control-layers {
+            margin-top: 60px;
         }
 
         @media (max-width: 768px) {
@@ -148,6 +144,9 @@
             .layer-selector { text-align: center; }
             .legend { width: auto; right: 10px; left: 10px; }
             .attribution-credit { right: auto; left: 0; }
+            .leaflet-top.leaflet-right .leaflet-control-layers {
+                margin-top: 0; /* Reset for mobile view */
+            }
         }
     </style>
 </head>
@@ -190,6 +189,7 @@
         attributionControl: false, 
         tap: false, 
         zoomAnimation: false,
+        zoomControl: false, // Disable default zoom control
         layers: [lightMap]
     });
 
@@ -202,7 +202,8 @@
     L.control.attribution({prefix: false}).addTo(map);
     L.control.scale({ imperial: true, metric: false }).addTo(map);
     var baseMaps = { "Light": lightMap, "Dark": darkMap, "Terrain": terrainMap };
-    L.control.layers(baseMaps).addTo(map);
+    L.control.layers(baseMaps, null, { position: 'topright' }).addTo(map);
+    L.control.zoom({ position: 'bottomleft' }).addTo(map);
 
     // --- Home Button Control ---
     L.Control.Custom = L.Control.extend({
@@ -217,7 +218,7 @@
         },
         onRemove: function(map) {}
     });
-    new L.Control.Custom({ position: 'topleft' }).addTo(map);
+    new L.Control.Custom({ position: 'bottomleft' }).addTo(map);
 
     // --- Global Variables ---
     let frostLayer, freezeLayer, chillLayer;
