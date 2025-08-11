@@ -108,6 +108,45 @@
             font-size: 13px;
             line-height: 1.4;
         }
+        
+        /* Larger touch targets for zoom controls */
+        .leaflet-bar a {
+            height: 35px !important;
+            width: 35px !important;
+            line-height: 35px !important;
+        }
+
+        /* --- Mobile Optimization --- */
+        @media (max-width: 768px) {
+            #description-box {
+                position: relative;
+                width: auto;
+                top: 0;
+                left: 0;
+                right: 0;
+                z-index: 10;
+                border-radius: 0;
+                box-shadow: none;
+                border-bottom: 1px solid #ccc;
+            }
+            .layer-selector {
+                position: relative;
+                width: auto;
+                top: 0;
+                right: 0;
+                left: 0;
+                z-index: 10;
+                border-radius: 0;
+                box-shadow: none;
+                border-bottom: 1px solid #ccc;
+                text-align: center;
+            }
+            .legend {
+                width: auto;
+                right: 10px;
+                left: 10px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -141,7 +180,9 @@
     var map = L.map('map', {
         center: [44.0, -70.0],
         zoom: 7,
-        attributionControl: false // Disable default attribution to use custom one
+        attributionControl: false, // Disable default attribution to use custom one
+        tap: false, // Recommended for mobile to avoid conflicts
+        zoomAnimation: false // Can improve performance on older devices
     });
 
     // Add a modern, clean base tile layer
