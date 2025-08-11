@@ -200,9 +200,10 @@
     let currentLayer = 'chill'; // Keep track of the active layer
 
     // --- Thematic Color Ramps ---
-    const chillColors = ['#ffffe5','#fff7bc','#fee391','#fec44f','#fe9929','#ec7014','#cc4c02','#993404','#662506']; // YlOrBr
-    const frostColors = ['#ffffd9','#edf8b1','#c7e9b4','#7fcdbb','#41b6c4','#1d91c0','#225ea8','#253494','#081d58']; // YlGnBu
-    const freezeColors = ['#f7fcfd','#e0ecf4','#bfd3e6','#9ebcda','#8c96c6','#8c6bb1','#88419d','#810f7c','#4d004b']; // PuBu
+    // Reversing the ramps so that earlier dates (lower DOY) get the more dramatic color.
+    const chillColors = ['#ffffe5','#fff7bc','#fee391','#fec44f','#fe9929','#ec7014','#cc4c02','#993404','#662506'].reverse(); // YlOrBr
+    const frostColors = ['#ffffd9','#edf8b1','#c7e9b4','#7fcdbb','#41b6c4','#1d91c0','#225ea8','#253494','#081d58'].reverse(); // YlGnBu
+    const freezeColors = ['#f7fcfd','#e0ecf4','#bfd3e6','#9ebcda','#8c96c6','#8c6bb1','#88419d','#810f7c','#4d004b'].reverse(); // PuBu
 
     // --- Content for the Description Box ---
     const layerDescriptions = {
