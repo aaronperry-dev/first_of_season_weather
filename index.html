@@ -174,7 +174,7 @@
         for (var i = 0; i < grades.length; i++) {
             div.innerHTML +=
                 '<i style="background:' + getColor(grades[i] + 1) + '"></i> ' +
-                doyToMonthDay(grades[i]) + (grades[i + 1] ? '&ndash;' + doyToMonthDay(grades[i + 1] - 1) + '<br>' : '+');
+                doyToMonthDay(grades[i]) + (grades[i + 1] ? ' to ' + doyToMonthDay(grades[i + 1] - 1) + '<br>' : '+');
         }
 
         return div;
