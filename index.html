@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>New England Frost/Freeze Data</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        #map {
+            width: 100%;
+            height: 100%;
+            background-color: #f0f0f0;
+        }
+        .info-popup {
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+        }
+        .info-popup h4 {
+            margin: 0 0 5px 0;
+            color: #333;
+        }
+        .info-popup p {
+            margin: 2px 0;
+            font-size: 0.9em;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+
+<div id="map"></div>
+
+<script>
+    // Initialize the map, centered on New England
+    var map = L.map('map').setView([44.0, -70.0], 6);
+
+    // Add a modern, clean base tile layer
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+        subdomains: 'abcd',
+        maxZoom: 20
+    }).addTo(map);
+
+    // --- Function to create popup content ---
+    function createPopupContent(properties, type) {
+        let title = type === 'frost' ? "First Frost" : "First Hard Freeze";
+        let earliest = properties[type === 'frost' ? 'first_frost_earliest' : 'first_hard_freeze_earliest'];
+        let early = properties[type === 'frost' ? 'first_frost_early_10p' : 'first_hard_freeze_early_10p'];
+        let median = properties[type === 'frost' ? 'first_frost_median' : 'first_hard_freeze_median'];
+        let late = properties[type === 'frost' ? 'first_frost_late_90p' : 'first_hard_freeze_late_90p'];
+        let latest = properties[type === 'frost' ? 'first_frost_latest' : 'first_hard_freeze_latest'];
+
+        return `<div class="info-popup">
+                    <h4>${properties.COUNTYNAME}, ${properties.STATE}</h4>
+                    <p><strong>${title} Statistics (Day of Year):</strong></p>
+                    <p><strong>Earliest:</strong> ${earliest}</p>
+                    <p><strong>Early (10%):</strong> ${early}</p>
+                    <p><strong>Median:</strong> ${median}</p>
+                    <p><strong>Late (90%):</strong> ${late}</p>
+                    <p><strong>Latest:</strong> ${latest}</p>
+                </div>`;
+    }
+
+
+    // --- Load GeoJSON data ---
+    // Fetch First Frost Data
+    fetch('first_frost_climo_counties_neweng.geojson')
+        .then(response => response.json())
+        .then(data => {
+            var frostLayer = L.geoJson(data, {
+                style: {
+                    color: "#007bff", // Blue for frost
+                    weight: 2,
+                    opacity: 0.7
+                },
+                onEachFeature: function (feature, layer) {
+                    layer.bindTooltip(createPopupContent(feature.properties, 'frost'));
+                }
+            }).addTo(map); // Add frost layer by default
+             // Add to layer control
+            controlLayers.addOverlay(frostLayer, "First Frost");
+        });
+
+    // Fetch First Hard Freeze Data
+    fetch('first_hardfreeze_climo_counties_neweng.geojson')
+        .then(response => response.json())
+        .then(data => {
+            var freezeLayer = L.geoJson(data, {
+                 style: {
+                    color: "#dc3545", // Red for hard freeze
+                    weight: 2,
+                    opacity: 0.7
+                },
+                onEachFeature: function (feature, layer) {
+                    layer.bindTooltip(createPopupContent(feature.properties, 'freeze'));
+                }
+            });
+             // Add to layer control
+            controlLayers.addOverlay(freezeLayer, "First Hard Freeze");
+        });
+
+    // Layer control
+    var baseLayers = {};
+    var overlayLayers = {};
+    var controlLayers = L.control.layers(baseLayers, overlayLayers).addTo(map);
+
+
+</script>
+
+</body>
+</html>
