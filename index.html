@@ -146,7 +146,7 @@
 
     // --- Function to create popup content ---
     function createPopupContent(properties, type) {
-        let title = type === 'frost' ? "First Frost" : "First Hard Freeze";
+        let title = type === 'frost' ? "First Frost (<=32 F)" : "First Hard Freeze (<=29 F)";
         let earliest = doyToMonthDay(properties[type === 'frost' ? 'first_frost_earliest' : 'first_hard_freeze_earliest']);
         let early = doyToMonthDay(properties[type === 'frost' ? 'first_frost_early_10p' : 'first_hard_freeze_early_10p']);
         let median = doyToMonthDay(properties[type === 'frost' ? 'first_frost_median' : 'first_hard_freeze_median']);
@@ -187,8 +187,8 @@
         const maxDoy = Math.max(...medianValues);
         
         const grades = [];
-        const step = (maxDoy - minDoy) / 5;
-        for (let i = 0; i < 5; i++) {
+        const step = (maxDoy - minDoy) / 6;
+        for (let i = 0; i < 6; i++) {
             grades.push(Math.round(minDoy + i * step));
         }
 
