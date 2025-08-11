@@ -185,6 +185,12 @@
         zoomAnimation: false // Can improve performance on older devices
     });
 
+    // Create a new pane for the city markers to ensure they are on top
+    map.createPane('cityPane');
+    map.getPane('cityPane').style.zIndex = 650;
+    map.getPane('cityPane').style.pointerEvents = 'none'; // Allow clicks to pass through to layers below
+
+
     // Add a modern, clean base tile layer
     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
@@ -343,6 +349,59 @@
     };
     legend.addTo(map);
 
+    // --- City Data ---
+    const cities = [
+        { name: "Bridgeport", state: "CT", coords: [41.1670, -73.2048], rank: 1 },
+        { name: "Stamford", state: "CT", coords: [41.0534, -73.5387], rank: 2 },
+        { name: "Portland", state: "ME", coords: [43.6615, -70.2553], rank: 1 },
+        { name: "Lewiston", state: "ME", coords: [44.1003, -70.2148], rank: 2 },
+        { name: "Boston", state: "MA", coords: [42.3601, -71.0589], rank: 1 },
+        { name: "Worcester", state: "MA", coords: [42.2626, -71.7981], rank: 2 },
+        { name: "Manchester", state: "NH", coords: [42.9956, -71.4548], rank: 1 },
+        { name: "Nashua", state: "NH", coords: [42.7654, -71.4676], rank: 2 },
+        { name: "Providence", state: "RI", coords: [41.8240, -71.4128], rank: 1 },
+        { name: "Cranston", state: "RI", coords: [41.7715, -71.4534], rank: 2 },
+        { name: "Burlington", state: "VT", coords: [44.4759, -73.2121], rank: 1 },
+        { name: "South Burlington", state: "VT", coords: [44.4684, -73.1732], rank: 2 }
+    ];
+
+    // --- Create City Markers and Manage Visibility ---
+    var cityMarkersLayer = L.layerGroup();
+    var allCityMarkers = [];
+
+    cities.forEach(city => {
+        var marker = L.circleMarker(city.coords, {
+            radius: 5,
+            fillColor: "black",
+            color: "#FFF",
+            weight: 1,
+            opacity: 1,
+            fillOpacity: 0.8,
+            pane: 'cityPane'
+        }).bindTooltip(city.name);
+        // Store the marker and its rank in an object
+        allCityMarkers.push({ marker: marker, rank: city.rank });
+    });
+
+    function updateCityVisibility() {
+        var currentZoom = map.getZoom();
+        cityMarkersLayer.clearLayers(); // Clear existing markers before adding new ones
+
+        allCityMarkers.forEach(cityInfo => {
+            // Show rank 1 cities at zoom 7 or higher
+            if (cityInfo.rank === 1 && currentZoom >= 7) {
+                cityMarkersLayer.addLayer(cityInfo.marker);
+            }
+            // Show rank 2 cities only at zoom 8 or higher
+            else if (cityInfo.rank === 2 && currentZoom >= 8) {
+                cityMarkersLayer.addLayer(cityInfo.marker);
+            }
+        });
+    }
+
+    cityMarkersLayer.addTo(map);
+    map.on('zoomend', updateCityVisibility);
+
 
     // --- Load GeoJSON data and initialize map ---
     Promise.all([
@@ -394,6 +453,7 @@
         chillLayer.addTo(map);
         legend.update('chill');
         updateDescriptionBox('chill');
+        updateCityVisibility(); // Initial call to set city visibility
 
     }).catch(error => console.error("Failed to load map data:", error));
 
