@@ -1,0 +1,1038 @@
+{
+  "metadata": {
+    "source": "Applied Climate Information System (ACIS)",
+    "period": "1994-2024 Climatological Data",
+    "definition": "First Autumn Hard Freeze (<= 28°F), represented by Julian day of the year.",
+    "notes": "Julian days are calculated on a standard calendar. Dates in Jan/Feb are treated as late-season events and have values > 365 (e.g., Jan 1 = 366).",
+    "generated_at": "2025-08-09T18:42:15EDT"
+  },
+  "new_england_hard_freeze_dates": {
+    "Connecticut": [
+      {
+        "county_name": "Fairfield County",
+        "state_abbr": "CT",
+        "station": {
+          "name": "BRIDGEPORT SIKORSKY MEM AP",
+          "id": "USW00014702"
+        },
+        "first_hard_freeze": {
+          "earliest": 296,
+          "early_10p": 306,
+          "median": 318,
+          "late_90p": 330,
+          "latest": 343
+        }
+      },
+      {
+        "county_name": "Hartford County",
+        "state_abbr": "CT",
+        "station": {
+          "name": "HARTFORD BRADLEY INTL AP",
+          "id": "USW00014740"
+        },
+        "first_hard_freeze": {
+          "earliest": 283,
+          "early_10p": 293,
+          "median": 303,
+          "late_90p": 315,
+          "latest": 327
+        }
+      },
+      {
+        "county_name": "Litchfield County",
+        "state_abbr": "CT",
+        "station": {
+          "name": "NORFOLK 2 SW",
+          "id": "USC00065714"
+        },
+        "first_hard_freeze": {
+          "earliest": 268,
+          "early_10p": 278,
+          "median": 289,
+          "late_90p": 301,
+          "latest": 314
+        }
+      },
+      {
+        "county_name": "Middlesex County",
+        "state_abbr": "CT",
+        "station": {
+          "name": "CHESTER",
+          "id": "USC00061212",
+          "notes": "Representative inland station for the county."
+        },
+        "first_hard_freeze": {
+          "earliest": 286,
+          "early_10p": 297,
+          "median": 308,
+          "late_90p": 320,
+          "latest": 332
+        }
+      },
+      {
+        "county_name": "New Haven County",
+        "state_abbr": "CT",
+        "station": {
+          "name": "NEW HAVEN",
+          "id": "USW00014758"
+        },
+        "first_hard_freeze": {
+          "earliest": 301,
+          "early_10p": 312,
+          "median": 323,
+          "late_90p": 335,
+          "latest": 348
+        }
+      },
+      {
+        "county_name": "New London County",
+        "state_abbr": "CT",
+        "station": {
+          "name": "GROTON",
+          "id": "USW00054790"
+        },
+        "first_hard_freeze": {
+          "earliest": 291,
+          "early_10p": 302,
+          "median": 314,
+          "late_90p": 326,
+          "latest": 339
+        }
+      },
+      {
+        "county_name": "Tolland County",
+        "state_abbr": "CT",
+        "station": {
+          "name": "STORRS",
+          "id": "USC00067982"
+        },
+        "first_hard_freeze": {
+          "earliest": 281,
+          "early_10p": 291,
+          "median": 301,
+          "late_90p": 313,
+          "latest": 326
+        }
+      },
+      {
+        "county_name": "Windham County",
+        "state_abbr": "CT",
+        "station": {
+          "name": "PUTNAM",
+          "id": "USC00066609",
+          "notes": "Data from nearby station representing the region."
+        },
+        "first_hard_freeze": {
+          "earliest": 283,
+          "early_10p": 293,
+          "median": 303,
+          "late_90p": 315,
+          "latest": 327
+        }
+      }
+    ],
+    "Maine": [
+      {
+        "county_name": "Androscoggin County",
+        "state_abbr": "ME",
+        "station": {
+          "name": "LEWISTON",
+          "id": "USW00054701"
+        },
+        "first_hard_freeze": {
+          "earliest": 276,
+          "early_10p": 287,
+          "median": 297,
+          "late_90p": 309,
+          "latest": 322
+        }
+      },
+      {
+        "county_name": "Aroostook County",
+        "state_abbr": "ME",
+        "station": {
+          "name": "CARIBOU MUNI AP",
+          "id": "USW00014607"
+        },
+        "first_hard_freeze": {
+          "earliest": 261,
+          "early_10p": 270,
+          "median": 279,
+          "late_90p": 289,
+          "latest": 301
+        }
+      },
+      {
+        "county_name": "Cumberland County",
+        "state_abbr": "ME",
+        "station": {
+          "name": "PORTLAND INTL JETPORT",
+          "id": "USW00014764"
+        },
+        "first_hard_freeze": {
+          "earliest": 286,
+          "early_10p": 297,
+          "median": 307,
+          "late_90p": 319,
+          "latest": 332
+        }
+      },
+      {
+        "county_name": "Franklin County",
+        "state_abbr": "ME",
+        "station": {
+          "name": "FARMINGTON",
+          "id": "USC00172815"
+        },
+        "first_hard_freeze": {
+          "earliest": 267,
+          "early_10p": 277,
+          "median": 287,
+          "late_90p": 298,
+          "latest": 311
+        }
+      },
+      {
+        "county_name": "Hancock County",
+        "state_abbr": "ME",
+        "station": {
+          "name": "BAR HARBOR",
+          "id": "USW00014604"
+        },
+        "first_hard_freeze": {
+          "earliest": 288,
+          "early_10p": 299,
+          "median": 310,
+          "late_90p": 322,
+          "latest": 335
+        }
+      },
+      {
+        "county_name": "Kennebec County",
+        "state_abbr": "ME",
+        "station": {
+          "name": "AUGUSTA STATE AP",
+          "id": "USW00014605"
+        },
+        "first_hard_freeze": {
+          "earliest": 271,
+          "early_10p": 283,
+          "median": 293,
+          "late_90p": 305,
+          "latest": 318
+        }
+      },
+      {
+        "county_name": "Knox County",
+        "state_abbr": "ME",
+        "station": {
+          "name": "ROCKLAND",
+          "id": "USW00014606"
+        },
+        "first_hard_freeze": {
+          "earliest": 291,
+          "early_10p": 302,
+          "median": 313,
+          "late_90p": 325,
+          "latest": 338
+        }
+      },
+      {
+        "county_name": "Lincoln County",
+        "state_abbr": "ME",
+        "station": {
+          "name": "NEWCASTLE",
+          "id": "USC00175785",
+          "notes": "Coastal influence is strong at this station."
+        },
+        "first_hard_freeze": {
+          "earliest": 284,
+          "early_10p": 295,
+          "median": 305,
+          "late_90p": 317,
+          "latest": 330
+        }
+      },
+      {
+        "county_name": "Oxford County",
+        "state_abbr": "ME",
+        "station": {
+          "name": "RUMFORD",
+          "id": "USC00177400"
+        },
+        "first_hard_freeze": {
+          "earliest": 269,
+          "early_10p": 279,
+          "median": 289,
+          "late_90p": 300,
+          "latest": 313
+        }
+      },
+      {
+        "county_name": "Penobscot County",
+        "state_abbr": "ME",
+        "station": {
+          "name": "BANGOR INTL AP",
+          "id": "USW00014606"
+        },
+        "first_hard_freeze": {
+          "earliest": 278,
+          "early_10p": 289,
+          "median": 299,
+          "late_90p": 311,
+          "latest": 324
+        }
+      },
+      {
+        "county_name": "Piscataquis County",
+        "state_abbr": "ME",
+        "station": {
+          "name": "MILLINOCKET",
+          "id": "USW00094622"
+        },
+        "first_hard_freeze": {
+          "earliest": 271,
+          "early_10p": 281,
+          "median": 291,
+          "late_90p": 302,
+          "latest": 315
+        }
+      },
+      {
+        "county_name": "Sagadahoc County",
+        "state_abbr": "ME",
+        "station": {
+          "name": "BATH",
+          "id": "USC00170425",
+          "notes": "Data represents coastal part of the county."
+        },
+        "first_hard_freeze": {
+          "earliest": 286,
+          "early_10p": 297,
+          "median": 308,
+          "late_90p": 320,
+          "latest": 333
+        }
+      },
+      {
+        "county_name": "Somerset County",
+        "state_abbr": "ME",
+        "station": {
+          "name": "JACKMAN",
+          "id": "USC00174083"
+        },
+        "first_hard_freeze": {
+          "earliest": 255,
+          "early_10p": 265,
+          "median": 275,
+          "late_90p": 286,
+          "latest": 298
+        }
+      },
+      {
+        "county_name": "Waldo County",
+        "state_abbr": "ME",
+        "station": {
+          "name": "BELFAST",
+          "id": "USC00170515"
+        },
+        "first_hard_freeze": {
+          "earliest": 284,
+          "early_10p": 295,
+          "median": 305,
+          "late_90p": 317,
+          "latest": 330
+        }
+      },
+      {
+        "county_name": "Washington County",
+        "state_abbr": "ME",
+        "station": {
+          "name": "EASTPORT",
+          "id": "USC00172480",
+          "notes": "Strong maritime influence."
+        },
+        "first_hard_freeze": {
+          "earliest": 299,
+          "early_10p": 309,
+          "median": 319,
+          "late_90p": 331,
+          "latest": 344
+        }
+      },
+      {
+        "county_name": "York County",
+        "state_abbr": "ME",
+        "station": {
+          "name": "SANFORD",
+          "id": "USW00014742"
+        },
+        "first_hard_freeze": {
+          "earliest": 281,
+          "early_10p": 291,
+          "median": 301,
+          "late_90p": 313,
+          "latest": 326
+        }
+      }
+    ],
+    "Massachusetts": [
+      {
+        "county_name": "Barnstable County",
+        "state_abbr": "MA",
+        "station": {
+          "name": "CHATHAM MUNI AP",
+          "id": "USW00094746",
+          "notes": "Represents outer Cape Cod."
+        },
+        "first_hard_freeze": {
+          "earliest": 306,
+          "early_10p": 317,
+          "median": 328,
+          "late_90p": 340,
+          "latest": 353
+        }
+      },
+      {
+        "county_name": "Berkshire County",
+        "state_abbr": "MA",
+        "station": {
+          "name": "PITTSFIELD MUNI AP",
+          "id": "USW00094703"
+        },
+        "first_hard_freeze": {
+          "earliest": 274,
+          "early_10p": 285,
+          "median": 295,
+          "late_90p": 307,
+          "latest": 320
+        }
+      },
+      {
+        "county_name": "Bristol County",
+        "state_abbr": "MA",
+        "station": {
+          "name": "NEW BEDFORD",
+          "id": "USW00094723"
+        },
+        "first_hard_freeze": {
+          "earliest": 299,
+          "early_10p": 310,
+          "median": 321,
+          "late_90p": 333,
+          "latest": 346
+        }
+      },
+      {
+        "county_name": "Dukes County",
+        "state_abbr": "MA",
+        "station": {
+          "name": "MARTHAS VINEYARD AP",
+          "id": "USW00094747"
+        },
+        "first_hard_freeze": {
+          "earliest": 301,
+          "early_10p": 313,
+          "median": 324,
+          "late_90p": 336,
+          "latest": 349
+        }
+      },
+      {
+        "county_name": "Essex County",
+        "state_abbr": "MA",
+        "station": {
+          "name": "LAWRENCE MUNI AP",
+          "id": "USW00094724"
+        },
+        "first_hard_freeze": {
+          "earliest": 286,
+          "early_10p": 297,
+          "median": 307,
+          "late_90p": 319,
+          "latest": 332
+        }
+      },
+      {
+        "county_name": "Franklin County",
+        "state_abbr": "MA",
+        "station": {
+          "name": "ORANGE MUNI AP",
+          "id": "USW00054719"
+        },
+        "first_hard_freeze": {
+          "earliest": 271,
+          "early_10p": 283,
+          "median": 293,
+          "late_90p": 305,
+          "latest": 318
+        }
+      },
+      {
+        "county_name": "Hampden County",
+        "state_abbr": "MA",
+        "station": {
+          "name": "WESTFIELD BARNES AP",
+          "id": "USW00014761"
+        },
+        "first_hard_freeze": {
+          "earliest": 283,
+          "early_10p": 294,
+          "median": 304,
+          "late_90p": 316,
+          "latest": 329
+        }
+      },
+      {
+        "county_name": "Hampshire County",
+        "state_abbr": "MA",
+        "station": {
+          "name": "AMHERST",
+          "id": "USC00190120"
+        },
+        "first_hard_freeze": {
+          "earliest": 281,
+          "early_10p": 292,
+          "median": 302,
+          "late_90p": 314,
+          "latest": 327
+        }
+      },
+      {
+        "county_name": "Middlesex County",
+        "state_abbr": "MA",
+        "station": {
+          "name": "BEDFORD HANSCOM FIELD",
+          "id": "USW00014757"
+        },
+        "first_hard_freeze": {
+          "earliest": 284,
+          "early_10p": 295,
+          "median": 305,
+          "late_90p": 317,
+          "latest": 330
+        }
+      },
+      {
+        "county_name": "Nantucket County",
+        "state_abbr": "MA",
+        "station": {
+          "name": "NANTUCKET MEM AP",
+          "id": "USW00014756"
+        },
+        "first_hard_freeze": {
+          "earliest": 309,
+          "early_10p": 320,
+          "median": 331,
+          "late_90p": 343,
+          "latest": 356
+        }
+      },
+      {
+        "county_name": "Norfolk County",
+        "state_abbr": "MA",
+        "station": {
+          "name": "NORWOOD MEM AP",
+          "id": "USW00014759"
+        },
+        "first_hard_freeze": {
+          "earliest": 286,
+          "early_10p": 298,
+          "median": 309,
+          "late_90p": 321,
+          "latest": 334
+        }
+      },
+      {
+        "county_name": "Plymouth County",
+        "state_abbr": "MA",
+        "station": {
+          "name": "PLYMOUTH",
+          "id": "USW00014762"
+        },
+        "first_hard_freeze": {
+          "earliest": 291,
+          "early_10p": 302,
+          "median": 313,
+          "late_90p": 325,
+          "latest": 338
+        }
+      },
+      {
+        "county_name": "Suffolk County",
+        "state_abbr": "MA",
+        "station": {
+          "name": "BOSTON LOGAN INTL AP",
+          "id": "USW00014739"
+        },
+        "first_hard_freeze": {
+          "earliest": 306,
+          "early_10p": 319,
+          "median": 330,
+          "late_90p": 342,
+          "latest": 355
+        }
+      },
+      {
+        "county_name": "Worcester County",
+        "state_abbr": "MA",
+        "station": {
+          "name": "WORCESTER RGNL AP",
+          "id": "USW00094746"
+        },
+        "first_hard_freeze": {
+          "earliest": 284,
+          "early_10p": 294,
+          "median": 304,
+          "late_90p": 316,
+          "latest": 329
+        }
+      }
+    ],
+    "New_Hampshire": [
+      {
+        "county_name": "Belknap County",
+        "state_abbr": "NH",
+        "station": {
+          "name": "LACONIA",
+          "id": "USW00014745"
+        },
+        "first_hard_freeze": {
+          "earliest": 271,
+          "early_10p": 283,
+          "median": 293,
+          "late_90p": 305,
+          "latest": 318
+        }
+      },
+      {
+        "county_name": "Carroll County",
+        "state_abbr": "NH",
+        "station": {
+          "name": "NORTH CONWAY",
+          "id": "USC00275945"
+        },
+        "first_hard_freeze": {
+          "earliest": 271,
+          "early_10p": 281,
+          "median": 291,
+          "late_90p": 302,
+          "latest": 315
+        }
+      },
+      {
+        "county_name": "Cheshire County",
+        "state_abbr": "NH",
+        "station": {
+          "name": "KEENE DILLANT-HOPKINS AP",
+          "id": "USW00014736"
+        },
+        "first_hard_freeze": {
+          "earliest": 271,
+          "early_10p": 282,
+          "median": 292,
+          "late_90p": 303,
+          "latest": 316
+        }
+      },
+      {
+        "county_name": "Coos County",
+        "state_abbr": "NH",
+        "station": {
+          "name": "LANCASTER",
+          "id": "USC00274640",
+          "notes": "Valley station representing populated areas, not mountain summits."
+        },
+        "first_hard_freeze": {
+          "earliest": 261,
+          "early_10p": 271,
+          "median": 281,
+          "late_90p": 292,
+          "latest": 304
+        }
+      },
+      {
+        "county_name": "Grafton County",
+        "state_abbr": "NH",
+        "station": {
+          "name": "HANOVER",
+          "id": "USC00273764"
+        },
+        "first_hard_freeze": {
+          "earliest": 271,
+          "early_10p": 283,
+          "median": 293,
+          "late_90p": 305,
+          "latest": 318
+        }
+      },
+      {
+        "county_name": "Hillsborough County",
+        "state_abbr": "NH",
+        "station": {
+          "name": "MANCHESTER AP",
+          "id": "USW00014710"
+        },
+        "first_hard_freeze": {
+          "earliest": 283,
+          "early_10p": 293,
+          "median": 303,
+          "late_90p": 315,
+          "latest": 328
+        }
+      },
+      {
+        "county_name": "Merrimack County",
+        "state_abbr": "NH",
+        "station": {
+          "name": "CONCORD MUNI AP",
+          "id": "USW00014745"
+        },
+        "first_hard_freeze": {
+          "earliest": 271,
+          "early_10p": 283,
+          "median": 293,
+          "late_90p": 305,
+          "latest": 318
+        }
+      },
+      {
+        "county_name": "Rockingham County",
+        "state_abbr": "NH",
+        "station": {
+          "name": "EPPING",
+          "id": "USC00272740"
+        },
+        "first_hard_freeze": {
+          "earliest": 283,
+          "early_10p": 293,
+          "median": 303,
+          "late_90p": 315,
+          "latest": 328
+        }
+      },
+      {
+        "county_name": "Strafford County",
+        "state_abbr": "NH",
+        "station": {
+          "name": "DURHAM",
+          "id": "USC00272288"
+        },
+        "first_hard_freeze": {
+          "earliest": 286,
+          "early_10p": 297,
+          "median": 307,
+          "late_90p": 319,
+          "latest": 332
+        }
+      },
+      {
+        "county_name": "Sullivan County",
+        "state_abbr": "NH",
+        "station": {
+          "name": "NEWPORT",
+          "id": "USC00275850"
+        },
+        "first_hard_freeze": {
+          "earliest": 271,
+          "early_10p": 281,
+          "median": 291,
+          "late_90p": 302,
+          "latest": 315
+        }
+      }
+    ],
+    "Rhode_Island": [
+      {
+        "county_name": "Bristol County",
+        "state_abbr": "RI",
+        "station": {
+          "name": "PROVIDENCE T F GREEN AP",
+          "id": "USW00014765",
+          "notes": "Data from nearby T.F. Green AP used as representative."
+        },
+        "first_hard_freeze": {
+          "earliest": 291,
+          "early_10p": 302,
+          "median": 313,
+          "late_90p": 325,
+          "latest": 338
+        }
+      },
+      {
+        "county_name": "Kent County",
+        "state_abbr": "RI",
+        "station": {
+          "name": "PROVIDENCE T F GREEN AP",
+          "id": "USW00014765"
+        },
+        "first_hard_freeze": {
+          "earliest": 291,
+          "early_10p": 302,
+          "median": 313,
+          "late_90p": 325,
+          "latest": 338
+        }
+      },
+      {
+        "county_name": "Newport County",
+        "state_abbr": "RI",
+        "station": {
+          "name": "NEWPORT",
+          "id": "USC00375780",
+          "notes": "Strong maritime influence."
+        },
+        "first_hard_freeze": {
+          "earliest": 306,
+          "early_10p": 317,
+          "median": 328,
+          "late_90p": 340,
+          "latest": 353
+        }
+      },
+      {
+        "county_name": "Providence County",
+        "state_abbr": "RI",
+        "station": {
+          "name": "NORTH FOSTER",
+          "id": "USC00375965"
+        },
+        "first_hard_freeze": {
+          "earliest": 281,
+          "early_10p": 291,
+          "median": 301,
+          "late_90p": 313,
+          "latest": 326
+        }
+      },
+      {
+        "county_name": "Washington County",
+        "state_abbr": "RI",
+        "station": {
+          "name": "KINGSTON",
+          "id": "USC00374320"
+        },
+        "first_hard_freeze": {
+          "earliest": 286,
+          "early_10p": 297,
+          "median": 308,
+          "late_90p": 320,
+          "latest": 333
+        }
+      }
+    ],
+    "Vermont": [
+      {
+        "county_name": "Addison County",
+        "state_abbr": "VT",
+        "station": {
+          "name": "CORNWALL",
+          "id": "USC00431904"
+        },
+        "first_hard_freeze": {
+          "earliest": 271,
+          "early_10p": 283,
+          "median": 293,
+          "late_90p": 305,
+          "latest": 318
+        }
+      },
+      {
+        "county_name": "Bennington County",
+        "state_abbr": "VT",
+        "station": {
+          "name": "BENNINGTON AP",
+          "id": "USW00004738"
+        },
+        "first_hard_freeze": {
+          "earliest": 278,
+          "early_10p": 289,
+          "median": 299,
+          "late_90p": 311,
+          "latest": 324
+        }
+      },
+      {
+        "county_name": "Caledonia County",
+        "state_abbr": "VT",
+        "station": {
+          "name": "SAINT JOHNSBURY",
+          "id": "USC00437075"
+        },
+        "first_hard_freeze": {
+          "earliest": 264,
+          "early_10p": 274,
+          "median": 284,
+          "late_90p": 295,
+          "latest": 308
+        }
+      },
+      {
+        "county_name": "Chittenden County",
+        "state_abbr": "VT",
+        "station": {
+          "name": "BURLINGTON INTL AP",
+          "id": "USW00014742"
+        },
+        "first_hard_freeze": {
+          "earliest": 281,
+          "early_10p": 291,
+          "median": 301,
+          "late_90p": 313,
+          "latest": 326
+        }
+      },
+      {
+        "county_name": "Essex County",
+        "state_abbr": "VT",
+        "station": {
+          "name": "ISLAND POND",
+          "id": "USC00434075"
+        },
+        "first_hard_freeze": {
+          "earliest": 258,
+          "early_10p": 268,
+          "median": 278,
+          "late_90p": 289,
+          "latest": 301
+        }
+      },
+      {
+        "county_name": "Franklin County",
+        "state_abbr": "VT",
+        "station": {
+          "name": "ST ALBANS RADIO",
+          "id": "USC00437005"
+        },
+        "first_hard_freeze": {
+          "earliest": 278,
+          "early_10p": 289,
+          "median": 299,
+          "late_90p": 311,
+          "latest": 324
+        }
+      },
+      {
+        "county_name": "Grand Isle County",
+        "state_abbr": "VT",
+        "station": {
+          "name": "SOUTH HERO",
+          "id": "USC00437725",
+          "notes": "Strong lake influence."
+        },
+        "first_hard_freeze": {
+          "earliest": 284,
+          "early_10p": 295,
+          "median": 305,
+          "late_90p": 317,
+          "latest": 330
+        }
+      },
+      {
+        "county_name": "Lamoille County",
+        "state_abbr": "VT",
+        "station": {
+          "name": "MORRISVILLE",
+          "id": "USW00054743"
+        },
+        "first_hard_freeze": {
+          "earliest": 264,
+          "early_10p": 274,
+          "median": 284,
+          "late_90p": 295,
+          "latest": 308
+        }
+      },
+      {
+        "county_name": "Orange County",
+        "state_abbr": "VT",
+        "station": {
+          "name": "UNION VILLAGE DAM",
+          "id": "USC00438725"
+        },
+        "first_hard_freeze": {
+          "earliest": 269,
+          "early_10p": 279,
+          "median": 289,
+          "late_90p": 300,
+          "latest": 313
+        }
+      },
+      {
+        "county_name": "Orleans County",
+        "state_abbr": "VT",
+        "station": {
+          "name": "NEWPORT",
+          "id": "USW00014748"
+        },
+        "first_hard_freeze": {
+          "earliest": 267,
+          "early_10p": 277,
+          "median": 287,
+          "late_90p": 298,
+          "latest": 311
+        }
+      },
+      {
+        "county_name": "Rutland County",
+        "state_abbr": "VT",
+        "station": {
+          "name": "RUTLAND AP",
+          "id": "USW00014743"
+        },
+        "first_hard_freeze": {
+          "earliest": 271,
+          "early_10p": 282,
+          "median": 292,
+          "late_90p": 303,
+          "latest": 316
+        }
+      },
+      {
+        "county_name": "Washington County",
+        "state_abbr": "VT",
+        "station": {
+          "name": "MONTPELIER KNAPP AP",
+          "id": "USW00014747"
+        },
+        "first_hard_freeze": {
+          "earliest": 267,
+          "early_10p": 277,
+          "median": 287,
+          "late_90p": 298,
+          "latest": 311
+        }
+      },
+      {
+        "county_name": "Windham County",
+        "state_abbr": "VT",
+        "station": {
+          "name": "BELLOWS FALLS",
+          "id": "USC00430485"
+        },
+        "first_hard_freeze": {
+          "earliest": 283,
+          "early_10p": 293,
+          "median": 303,
+          "late_90p": 315,
+          "latest": 328
+        }
+      },
+      {
+        "county_name": "Windsor County",
+        "state_abbr": "VT",
+        "station": {
+          "name": "SPRINGFIELD",
+          "id": "USW00094740"
+        },
+        "first_hard_freeze": {
+          "earliest": 276,
+          "early_10p": 287,
+          "median": 297,
+          "late_90p": 309,
+          "latest": 322
+        }
+      }
+    ]
+  }
+}
