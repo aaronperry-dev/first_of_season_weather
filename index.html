@@ -27,10 +27,13 @@
             margin: 0 0 5px 0;
             color: #333;
         }
-        .info-popup p {
-            margin: 2px 0;
-            font-size: 0.9em;
-            color: #555;
+        .info-popup table {
+            width: 100%;
+        }
+        .info-popup td {
+             padding: 2px 5px;
+             font-size: 0.9em;
+             color: #555;
         }
         .legend {
             line-height: 18px;
@@ -101,12 +104,14 @@
 
         return `<div class="info-popup">
                     <h4>${properties.COUNTYNAME} County, ${properties.STATE}</h4>
-                    <p><strong>${title} Statistics</strong></p>
-                    <p><strong>Earliest (10th PCT):</strong> ${earliest}</p>
-                    <p><strong>Early    (25th PCT):</strong> ${early}</p>
-                    <p><strong>Median   (50th PCT):</strong> ${median}</p>
-                    <p><strong>Late     (90th PCT):</strong> ${late}</p>
-                    <p><strong>Latest   (99th PCT):</strong> ${latest}</p>
+                    <strong>${title} Statistics</strong>
+                    <table>
+                        <tr><td><strong>Earliest (10th PCT):</strong></td><td>${earliest}</td></tr>
+                        <tr><td><strong>Early (25th PCT):</strong></td><td>${early}</td></tr>
+                        <tr><td><strong>Median (50th PCT):</strong></td><td>${median}</td></tr>
+                        <tr><td><strong>Late (90th PCT):</strong></td><td>${late}</td></tr>
+                        <tr><td><strong>Latest (99th PCT):</strong></td><td>${latest}</td></tr>
+                    </table>
                 </div>`;
     }
 
