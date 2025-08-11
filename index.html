@@ -60,8 +60,8 @@
         }
         .layer-selector {
             position: absolute;
-            top: 10px;
-            right: 50px;
+            top: 50px; /* Pushed down below basemap selector */
+            right: 10px;
             z-index: 1000;
             background: white;
             padding: 5px 10px;
@@ -77,8 +77,8 @@
         }
         .attribution-credit {
             position: absolute;
-            bottom: 0;
-            left: 0;
+            bottom: 5px; /* Adjusted for spacing */
+            right: 10px; /* Moved to the right */
             z-index: 1000;
             background: rgba(255, 255, 255, 0.9);
             padding: 2px 5px;
@@ -86,7 +86,7 @@
         }
         #description-box {
             position: absolute;
-            top: 10px;
+            top: 90px; /* Pushed down below zoom/home controls */
             left: 10px;
             z-index: 1000;
             width: 280px;
@@ -117,11 +117,19 @@
             color: #000;
             text-shadow: 0 0 3px #fff, 0 0 3px #fff, 0 0 3px #fff;
         }
-        /* Style for the home button */
         .leaflet-control-custom a {
             font-size: 1.4em;
             text-align: center;
             cursor: pointer;
+        }
+        /* Spacing for bottom-left controls */
+        .leaflet-bottom.leaflet-left {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .leaflet-control-scale {
+            margin-bottom: 5px; /* Space between scale and attribution */
         }
 
         @media (max-width: 768px) {
@@ -135,9 +143,11 @@
                 border-radius: 0;
                 box-shadow: none;
                 border-bottom: 1px solid #ccc;
+                margin-top: 0 !important;
             }
             .layer-selector { text-align: center; }
             .legend { width: auto; right: 10px; left: 10px; }
+            .attribution-credit { right: auto; left: 0; }
         }
     </style>
 </head>
@@ -311,11 +321,9 @@
 
     // --- GeoJSON Layer Events ---
     function onEachFeature(feature, layer) {
-        // Bind the tooltip
         let type = layer.options.dataType;
         layer.bindTooltip(createPopupContent(feature.properties, type), {pane: 'tooltipPane'});
 
-        // Set hover events
         layer.on({
             mouseover: function(e) {
                 var layer = e.target;
@@ -325,8 +333,6 @@
                 }
             },
             mouseout: function(e) {
-                // This is tricky because each layer is its own GeoJSON object.
-                // We find which main layer this feature belongs to and reset its style.
                 if (currentLayer === 'chill') chillLayer.resetStyle(e.target);
                 if (currentLayer === 'frost') frostLayer.resetStyle(e.target);
                 if (currentLayer === 'freeze') freezeLayer.resetStyle(e.target);
