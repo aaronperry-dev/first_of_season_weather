@@ -189,17 +189,14 @@
     var map = L.map('map', {
         center: [44.0, -70.0],
         zoom: 7,
-        attributionControl: false, // Disable default attribution to use custom one
-        tap: false, // Recommended for mobile to avoid conflicts
-        zoomAnimation: false // Can improve performance on older devices
+        attributionControl: false, 
+        tap: false, 
+        zoomAnimation: false 
     });
 
     // --- Pane Management for Layering ---
-    // Pane for cities to ensure they are on top of counties
     map.createPane('cityPane');
     map.getPane('cityPane').style.zIndex = 650;
-    
-    // Pane for tooltips to ensure they are on top of everything
     map.getPane('tooltipPane').style.zIndex = 700;
 
 
@@ -215,10 +212,9 @@
     // --- Global variables for layers and data ---
     let frostLayer, freezeLayer, chillLayer;
     let frostData, freezeData, chillData;
-    let currentLayer = 'chill'; // Keep track of the active layer
+    let currentLayer = 'chill';
 
     // --- Thematic Color Ramps ---
-    // Reversing the ramps so that earlier dates (lower DOY) get the more dramatic color.
     const chillColors = ['#ffffe5','#fff7bc','#fee391','#fec44f','#fe9929','#ec7014','#cc4c02','#993404','#662506'].reverse(); // YlOrBr
     const frostColors = ['#ffffd9','#edf8b1','#c7e9b4','#7fcdbb','#41b6c4','#1d91c0','#225ea8','#253494','#081d58'].reverse(); // YlGnBu
     const freezeColors = ['#f7fcfd','#e0ecf4','#bfd3e6','#9ebcda','#8c96c6','#8c6bb1','#88419d','#810f7c','#4d004b'].reverse(); // PuBu
@@ -241,7 +237,6 @@
 
     // --- Helper Functions ---
 
-    // Function to update the description box content
     function updateDescriptionBox(layerType) {
         const descriptionBox = document.getElementById('description-box');
         const content = layerDescriptions[layerType];
@@ -250,7 +245,6 @@
         }
     }
 
-    // Function to convert Day of Year to "Mon Day" format
     function doyToMonthDay(doy) {
         if (doy === null || doy === undefined) return 'N/A';
         const date = new Date(new Date().getFullYear(), 0);
@@ -258,9 +252,8 @@
         return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     }
 
-    // Updated getColor function to accept a specific color ramp
     function getColor(doy, minDoy, maxDoy, colors) {
-        if (doy === null || doy === undefined) return '#cccccc'; // Handle missing data
+        if (doy === null || doy === undefined) return '#cccccc';
         const range = maxDoy - minDoy;
         if (range <= 0) return colors[0];
         const index = Math.min(Math.floor(((doy - minDoy) / range) * (colors.length - 1)), colors.length - 1);
@@ -299,8 +292,8 @@
                     <h4>${properties.COUNTYNAME} County, ${properties.STATE}</h4>
                     <strong>${title} Statistics</strong>
                     <table>
-                        <tr><td><strong>Earliest&nbsp;(10th Percentile):</strong></td><td>${earliest}</td></tr>
-                        <tr><td><strong>Early&nbsp;&nbsp;&nbsp;&nbsp;(25th Percentile):</strong></td><td>${early}</td></tr>
+                        <tr><td><strong>Earliest (10th Percentile):</strong></td><td>${earliest}</td></tr>
+                        <tr><td><strong>Early&nbsp;&nbsp;&nbsp;(25th Percentile):</strong></td><td>${early}</td></tr>
                         <tr><td><strong>Median&nbsp;&nbsp;&nbsp;(50th Percentile):</strong></td><td>${median}</td></tr>
                         <tr><td><strong>Late&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(90th Percentile):</strong></td><td>${late}</td></tr>
                         <tr><td><strong>Latest&nbsp;&nbsp;&nbsp;(99th Percentile):</strong></td><td>${latest}</td></tr>
@@ -377,12 +370,9 @@
         { name: "South Burlington", state: "VT", coords: [44.4684, -73.1732], rank: 2 }
     ];
 
-    // --- Create City Markers and Manage Visibility ---
+    // --- Create City Markers ---
     var cityMarkersLayer = L.layerGroup();
-    var allCityMarkers = [];
-
     cities.forEach(city => {
-        // Create the black circle marker
         var circle = L.circleMarker(city.coords, {
             radius: 5,
             fillColor: "black",
@@ -393,39 +383,19 @@
             pane: 'cityPane'
         });
 
-        // Create the static text label
         var label = L.marker(city.coords, {
             icon: L.divIcon({
                 className: 'city-label',
-                html: `&nbsp;&nbsp;${city.name}`, // Add spacing
-                iconAnchor: [0, 8] // Anchor label to the side of the point
+                html: `&nbsp;&nbsp;${city.name}`,
+                iconAnchor: [0, 8] 
             }),
             pane: 'cityPane'
         });
         
-        // Group the circle and label together
         var cityGroup = L.layerGroup([circle, label]);
-        allCityMarkers.push({ group: cityGroup, rank: city.rank });
+        cityMarkersLayer.addLayer(cityGroup);
     });
-
-    function updateCityVisibility() {
-        var currentZoom = map.getZoom();
-        cityMarkersLayer.clearLayers(); // Clear existing markers
-
-        allCityMarkers.forEach(cityInfo => {
-            // Show rank 1 cities at zoom 7 or higher
-            if (cityInfo.rank === 1 && currentZoom >= 7) {
-                cityMarkersLayer.addLayer(cityInfo.group);
-            }
-            // Show rank 2 cities only at zoom 8 or higher
-            else if (cityInfo.rank === 2 && currentZoom >= 8) {
-                cityMarkersLayer.addLayer(cityInfo.group);
-            }
-        });
-    }
-
     cityMarkersLayer.addTo(map);
-    map.on('zoomend', updateCityVisibility);
 
 
     // --- Load GeoJSON data and initialize map ---
@@ -474,11 +444,9 @@
             onEachFeature: (feature, layer) => layer.bindTooltip(createPopupContent(feature.properties, 'chill'))
         });
 
-        // Add initial layer and update legend and description
         chillLayer.addTo(map);
         legend.update('chill');
         updateDescriptionBox('chill');
-        updateCityVisibility(); // Initial call to set city visibility
 
     }).catch(error => console.error("Failed to load map data:", error));
 
@@ -487,13 +455,10 @@
     document.getElementById('layer-select').addEventListener('change', function(e) {
         const selectedLayer = e.target.value;
 
-        // Remove current layer
         if (map.hasLayer(frostLayer)) map.removeLayer(frostLayer);
         if (map.hasLayer(freezeLayer)) map.removeLayer(freezeLayer);
         if (map.hasLayer(chillLayer)) map.removeLayer(chillLayer);
         
-
-        // Add new layer and update legend and description
         if (selectedLayer === 'frost') {
             map.addLayer(frostLayer);
             legend.update('frost');
