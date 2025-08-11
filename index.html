@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>First Frost/Hard Freeze Dates (per County) in New England</title>
+    <title>First Frost/Hard Freeze/Fall Chill Dates (per County) in New England</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
@@ -90,6 +90,7 @@
 <div class="layer-selector">
     <label for="layer-select"></label>
     <select id="layer-select">
+        <option value="chill">First Fall Chill Dates</option>
         <option value="frost">First Frost Dates</option>
         <option value="freeze">First Hard Freeze Dates</option>
     </select>
@@ -119,14 +120,15 @@
 
 
     // --- Global variables for layers and data ---
-    let frostLayer, freezeLayer;
-    let frostData, freezeData;
-    let currentLayer = 'frost'; // Keep track of the active layer
+    let frostLayer, freezeLayer, chillLayer;
+    let frostData, freezeData, chillData;
+    let currentLayer = 'chill'; // Keep track of the active layer
 
     // --- Helper Functions ---
 
     // Function to convert Day of Year to "Mon Day" format
     function doyToMonthDay(doy) {
+        if (doy === null || doy === undefined) return 'N/A';
         const date = new Date(new Date().getFullYear(), 0);
         date.setDate(doy);
         return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
@@ -146,22 +148,41 @@
 
     // --- Function to create popup content ---
     function createPopupContent(properties, type) {
-        let title = type === 'frost' ? "First Frost (&le;32&deg;F)" : "First Hard Freeze (&le;29&deg;F)";
-        let earliest = doyToMonthDay(properties[type === 'frost' ? 'first_frost_earliest' : 'first_hard_freeze_earliest']);
-        let early = doyToMonthDay(properties[type === 'frost' ? 'first_frost_early_10p' : 'first_hard_freeze_early_10p']);
-        let median = doyToMonthDay(properties[type === 'frost' ? 'first_frost_median' : 'first_hard_freeze_median']);
-        let late = doyToMonthDay(properties[type === 'frost' ? 'first_frost_late_90p' : 'first_hard_freeze_late_90p']);
-        let latest = doyToMonthDay(properties[type === 'frost' ? 'first_frost_latest' : 'first_hard_freeze_latest']);
+        let title, earliest, early, median, late, latest;
+
+        if (type === 'frost') {
+            title = "First Frost (&le;32&deg;F)";
+            earliest = doyToMonthDay(properties.first_frost_earliest);
+            early = doyToMonthDay(properties.first_frost_early_10p);
+            median = doyToMonthDay(properties.first_frost_median);
+            late = doyToMonthDay(properties.first_frost_late_90p);
+            latest = doyToMonthDay(properties.first_frost_latest);
+        } else if (type === 'freeze') {
+            title = "First Hard Freeze (&le;29&deg;F)";
+            earliest = doyToMonthDay(properties.first_hard_freeze_earliest);
+            early = doyToMonthDay(properties.first_hard_freeze_early_10p);
+            median = doyToMonthDay(properties.first_hard_freeze_median);
+            late = doyToMonthDay(properties.first_hard_freeze_late_90p);
+            latest = doyToMonthDay(properties.first_hard_freeze_latest);
+        } else { // 'chill'
+            title = "First Fall Chill (&le;40&deg;F)";
+            earliest = doyToMonthDay(properties.first_foliage_chill_earliest);
+            early = doyToMonthDay(properties.first_foliage_chill_early_10p);
+            median = doyToMonthDay(properties.first_foliage_chill_median);
+            late = doyToMonthDay(properties.first_foliage_chill_late_90p);
+            latest = doyToMonthDay(properties.first_foliage_chill_latest);
+        }
+
 
         return `<div class="info-popup">
                     <h4>${properties.COUNTYNAME} County, ${properties.STATE}</h4>
                     <strong>${title} Statistics</strong>
                     <table>
                         <tr><td><strong>Earliest (p10):</strong></td><td>${earliest}</td></tr>
-                        <tr><td><strong>Early    (p25):</strong></td><td>${early}</td></tr>
-                        <tr><td><strong>Median   (p50):</strong></td><td>${median}</td></tr>
-                        <tr><td><strong>Late     (p90):</strong></td><td>${late}</td></tr>
-                        <tr><td><strong>Latest   (p99):</strong></td><td>${latest}</td></tr>
+                        <tr><td><strong>Early&nbsp;&nbsp;&nbsp;(p25):</strong></td><td>${early}</td></tr>
+                        <tr><td><strong>Median&nbsp;&nbsp;&nbsp;(p50):</strong></td><td>${median}</td></tr>
+                        <tr><td><strong>Late&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(p90):</strong></td><td>${late}</td></tr>
+                        <tr><td><strong>Latest&nbsp;&nbsp;&nbsp;(p99):</strong></td><td>${latest}</td></tr>
                     </table>
                 </div>`;
     }
@@ -174,8 +195,21 @@
         return this._div;
     };
     legend.update = function (layerType) {
-        const data = layerType === 'freeze' ? freezeData : frostData;
-        const medianProperty = layerType === 'freeze' ? 'first_hard_freeze_median' : 'first_frost_median';
+        let data, medianProperty, title;
+        
+        if (layerType === 'freeze') {
+            data = freezeData;
+            medianProperty = 'first_hard_freeze_median';
+            title = 'Median Freeze Dates';
+        } else if (layerType === 'frost') {
+            data = frostData;
+            medianProperty = 'first_frost_median';
+            title = 'Median Frost Dates';
+        } else { // 'chill'
+            data = chillData;
+            medianProperty = 'first_foliage_chill_median';
+            title = 'Median Fall Chill Dates';
+        }
         
         if (!data) {
             this._div.innerHTML = '<strong>Median Dates</strong><br>Loading...';
@@ -192,7 +226,7 @@
             grades.push(Math.round(minDoy + i * step));
         }
 
-        let innerHTML = `<strong>Median ${layerType === 'freeze' ? 'Freeze' : 'Frost'} Dates</strong><br>`;
+        let innerHTML = `<strong>${title}</strong><br>`;
         for (var i = 0; i < grades.length; i++) {
             const color = getColor(grades[i] + 1, minDoy, maxDoy);
             innerHTML +=
@@ -207,10 +241,12 @@
     // --- Load GeoJSON data and initialize map ---
     Promise.all([
         fetch('first_frost_climo_counties_neweng.geojson').then(res => res.json()),
-        fetch('first_hardfreeze_climo_counties_neweng.geojson').then(res => res.json())
-    ]).then(([frostJson, freezeJson]) => {
+        fetch('first_hardfreeze_climo_counties_neweng.geojson').then(res => res.json()),
+        fetch('first_fallchill_climo_counties_neweng.geojson').then(res => res.json())
+    ]).then(([frostJson, freezeJson, chillJson]) => {
         frostData = frostJson;
         freezeData = freezeJson;
+        chillData = chillJson;
 
         const frostMedianValues = frostData.features.map(f => f.properties.first_frost_median).filter(v => v != null);
         const frostMin = Math.min(...frostMedianValues);
@@ -219,6 +255,10 @@
         const freezeMedianValues = freezeData.features.map(f => f.properties.first_hard_freeze_median).filter(v => v != null);
         const freezeMin = Math.min(...freezeMedianValues);
         const freezeMax = Math.max(...freezeMedianValues);
+        
+        const chillMedianValues = chillData.features.map(f => f.properties.first_foliage_chill_median).filter(v => v != null);
+        const chillMin = Math.min(...chillMedianValues);
+        const chillMax = Math.max(...chillMedianValues);
 
         frostLayer = L.geoJson(frostData, {
             style: feature => ({
@@ -235,10 +275,18 @@
             }),
             onEachFeature: (feature, layer) => layer.bindTooltip(createPopupContent(feature.properties, 'freeze'))
         });
+        
+        chillLayer = L.geoJson(chillData, {
+            style: feature => ({
+                fillColor: getColor(feature.properties.first_foliage_chill_median, chillMin, chillMax),
+                weight: 1, opacity: 1, color: 'black', dashArray: '0', fillOpacity: 0.8
+            }),
+            onEachFeature: (feature, layer) => layer.bindTooltip(createPopupContent(feature.properties, 'chill'))
+        });
 
         // Add initial layer and update legend
-        frostLayer.addTo(map);
-        legend.update('frost');
+        chillLayer.addTo(map);
+        legend.update('chill');
 
     }).catch(error => console.error("Failed to load map data:", error));
 
@@ -248,11 +296,10 @@
         const selectedLayer = e.target.value;
 
         // Remove current layer
-        if (currentLayer === 'frost' && map.hasLayer(frostLayer)) {
-            map.removeLayer(frostLayer);
-        } else if (currentLayer === 'freeze' && map.hasLayer(freezeLayer)) {
-            map.removeLayer(freezeLayer);
-        }
+        if (map.hasLayer(frostLayer)) map.removeLayer(frostLayer);
+        if (map.hasLayer(freezeLayer)) map.removeLayer(freezeLayer);
+        if (map.hasLayer(chillLayer)) map.removeLayer(chillLayer);
+        
 
         // Add new layer and update legend
         if (selectedLayer === 'frost') {
@@ -261,6 +308,9 @@
         } else if (selectedLayer === 'freeze') {
             map.addLayer(freezeLayer);
             legend.update('freeze');
+        } else if (selectedLayer === 'chill') {
+            map.addLayer(chillLayer);
+            legend.update('chill');
         }
 
         currentLayer = selectedLayer;
