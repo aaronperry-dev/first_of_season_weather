@@ -222,7 +222,7 @@
         frostLayer = L.geoJson(frostData, {
             style: feature => ({
                 fillColor: getColor(feature.properties.first_frost_median, frostMin, frostMax),
-                weight: 1, opacity: 1, color: 'black', dashArray: '0', fillOpacity: 0.7
+                weight: 1, opacity: 1, color: 'black', dashArray: '0', fillOpacity: 0.8
             }),
             onEachFeature: (feature, layer) => layer.bindTooltip(createPopupContent(feature.properties, 'frost'))
         });
@@ -230,7 +230,7 @@
         freezeLayer = L.geoJson(freezeData, {
             style: feature => ({
                 fillColor: getColor(feature.properties.first_hard_freeze_median, freezeMin, freezeMax),
-                weight: 1, opacity: 1, color: 'black', dashArray: '0', fillOpacity: 0.7
+                weight: 1, opacity: 1, color: 'black', dashArray: '0', fillOpacity: 0.8
             }),
             onEachFeature: (feature, layer) => layer.bindTooltip(createPopupContent(feature.properties, 'freeze'))
         });
