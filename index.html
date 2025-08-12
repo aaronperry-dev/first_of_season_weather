@@ -160,7 +160,7 @@
         <option value="chill">First Fall Chill Dates</option>
         <option value="frost">First Frost Dates</option>
         <option value="freeze">First Hard Freeze Dates</option>
-		<option value="freeze">First Snowfall Dates</option>
+        <option value="snow">First Snowfall Dates</option>
     </select>
 </div>
 
@@ -180,7 +180,7 @@
         attribution: '&copy; CARTO'
     });
     var terrainMap = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
-	    attribution: 'Tiles &copy; Esri'
+     attribution: 'Tiles &copy; Esri'
     });
 
     // Initialize the map
@@ -222,8 +222,8 @@
     new L.Control.Custom({ position: 'bottomleft' }).addTo(map);
 
     // --- Global Variables ---
-    let frostLayer, freezeLayer, chillLayer;
-    let frostData, freezeData, chillData;
+    let frostLayer, freezeLayer, chillLayer, snowLayer;
+    let frostData, freezeData, chillData, snowData;
     let currentLayer = 'chill';
     let lastHoveredLayer = null;
 
@@ -231,14 +231,14 @@
     const chillColors = ['#ffffe5','#fff7bc','#fee391','#fec44f','#fe9929','#ec7014','#cc4c02','#993404','#662506'].reverse();
     const frostColors = ['#ffffd9','#edf8b1','#c7e9b4','#7fcdbb','#41b6c4','#1d91c0','#225ea8','#253494','#081d58'].reverse();
     const freezeColors = ['#f7fcfd','#e0ecf4','#bfd3e6','#9ebcda','#8c96c6','#8c6bb1','#88419d','#810f7c','#4d004b'].reverse();
-	const snowColors = ['#f7fcfd','#e0ecf4','#bfd3e6','#9ebcda','#8c96c6','#8c6bb1','#88419d','#810f7c','#4d004b'].reverse();
+    const snowColors = ['#f7fbff','#deebf7','#c6dbef','#9ecae1','#6baed6','#4292c6','#2171b5','#08519c','#08306b'].reverse();
 
     // --- Content Definitions ---
     const layerDescriptions = {
         chill: { title: "First Fall Chill", text: "Median date of the first day where the temperature drops to 45°F or below.<br><br><i>Note: Actual dates can vary within a county due to elevation, proximity to the ocean, and other local conditions.</i>" },
         frost: { title: "First Frost", text: "Median date of the first frost, when temperatures reach 32°F or lower.<br><br><i>Note: Actual dates can vary within a county due to elevation, proximity to the ocean, and other local conditions.</i>" },
         freeze: { title: "First Hard Freeze", text: "Median date of the first 'hard freeze,' when temperatures reach 29°F or lower.<br><br><i>Note: Actual dates can vary within a county due to elevation, proximity to the ocean, and other local conditions.</i>" },
-		freeze: { title: "First Snowfall", text: "Median date of the first snowfall, as measured by the first >=0.1" of snowfall of the season.<br><br><i>Note: Actual dates can vary within a county due to elevation, proximity to the ocean, and other local conditions.</i>" }
+        snow: { title: "First Snowfall", text: "Median date of the first snowfall, as measured by the first >=0.1\" of snowfall of the season.<br><br><i>Note: Actual dates can vary within a county due to elevation, proximity to the ocean, and other local conditions.</i>" }
     };
 
     // --- Helper Functions ---
@@ -270,17 +270,20 @@
         } else if (type === 'freeze') {
             title = "First Hard Freeze (MinT &le;29&deg;F)";
             [earliest, early, median, late, latest] = [properties.first_hard_freeze_earliest, properties.first_hard_freeze_early_10p, properties.first_hard_freeze_median, properties.first_hard_freeze_late_90p, properties.first_hard_freeze_latest];
+        } else if (type === 'snow') {
+            title = "First Snowfall >= 0.1\"";
+            [earliest, early, median, late, latest] = [properties.snow_earliest, properties.snow_early_10p, properties.snow_median, properties.snow_late_90p, properties.snow_latest];
         } else {
             title = "First Fall Chill (MinT &le;45&deg;F)";
             [earliest, early, median, late, latest] = [properties.first_foliage_chill_earliest, properties.first_foliage_chill_early_10p, properties.first_foliage_chill_median, properties.first_foliage_chill_late_90p, properties.first_foliage_chill_latest];
         }
         return `<div class="info-popup"><h4>${properties.COUNTYNAME} County, ${properties.STATE}</h4><strong>${title} Statistics</strong><table>
-                    <tr><td><strong>Earliest (10th Percentile):</strong></td><td>${doyToMonthDay(earliest)}</td></tr>
-                    <tr><td><strong>Early&nbsp;&nbsp;&nbsp;(25th Percentile):</strong></td><td>${doyToMonthDay(early)}</td></tr>
-                    <tr><td><strong>Median&nbsp;&nbsp;&nbsp;(50th Percentile):</strong></td><td>${doyToMonthDay(median)}</td></tr>
-                    <tr><td><strong>Late&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(90th Percentile):</strong></td><td>${doyToMonthDay(late)}</td></tr>
-                    <tr><td><strong>Latest&nbsp;&nbsp;&nbsp;(99th Percentile):</strong></td><td>${doyToMonthDay(latest)}</td></tr>
-                </table></div>`;
+                        <tr><td><strong>Earliest (10th Percentile):</strong></td><td>${doyToMonthDay(earliest)}</td></tr>
+                        <tr><td><strong>Early&nbsp;&nbsp;&nbsp;(25th Percentile):</strong></td><td>${doyToMonthDay(early)}</td></tr>
+                        <tr><td><strong>Median&nbsp;&nbsp;&nbsp;(50th Percentile):</strong></td><td>${doyToMonthDay(median)}</td></tr>
+                        <tr><td><strong>Late&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(90th Percentile):</strong></td><td>${doyToMonthDay(late)}</td></tr>
+                        <tr><td><strong>Latest&nbsp;&nbsp;&nbsp;(99th Percentile):</strong></td><td>${doyToMonthDay(latest)}</td></tr>
+                    </table></div>`;
     }
 
     // --- Legend Control ---
@@ -290,6 +293,7 @@
         let data, medianProperty, title, colors;
         if (layerType === 'freeze') { [data, medianProperty, title, colors] = [freezeData, 'first_hard_freeze_median', 'Median Freeze Dates', freezeColors]; }
         else if (layerType === 'frost') { [data, medianProperty, title, colors] = [frostData, 'first_frost_median', 'Median Frost Dates', frostColors]; }
+        else if (layerType === 'snow') { [data, medianProperty, title, colors] = [snowData, 'snow_median', 'Median Snowfall Dates', snowColors]; }
         else { [data, medianProperty, title, colors] = [chillData, 'first_foliage_chill_median', 'Median Fall Chill Dates', chillColors]; }
         
         if (!data) { this._div.innerHTML = '<strong>Median Dates</strong><br>Loading...'; return; }
@@ -340,6 +344,7 @@
                 if (currentLayer === 'chill') chillLayer.resetStyle(e.target);
                 if (currentLayer === 'frost') frostLayer.resetStyle(e.target);
                 if (currentLayer === 'freeze') freezeLayer.resetStyle(e.target);
+                if (currentLayer === 'snow') snowLayer.resetStyle(e.target);
             }
         });
     }
@@ -348,9 +353,10 @@
     Promise.all([
         fetch('./data/first_frost_climo_counties_neweng.geojson').then(res => res.json()),
         fetch('./data/first_hardfreeze_climo_counties_neweng.geojson').then(res => res.json()),
-        fetch('./data/first_fallchill_climo_counties_neweng.geojson').then(res => res.json())
-    ]).then(([frostJson, freezeJson, chillJson]) => {
-        [frostData, freezeData, chillData] = [frostJson, freezeJson, chillJson];
+        fetch('./data/first_fallchill_climo_counties_neweng.geojson').then(res => res.json()),
+        fetch('first_snowfall_climo_counties_neweng.geojson').then(res => res.json())
+    ]).then(([frostJson, freezeJson, chillJson, snowJson]) => {
+        [frostData, freezeData, chillData, snowData] = [frostJson, freezeJson, chillJson, snowJson];
 
         const frostMedianValues = frostData.features.map(f => f.properties.first_frost_median).filter(v => v != null);
         const [frostMin, frostMax] = [Math.min(...frostMedianValues), Math.max(...frostMedianValues)];
@@ -360,6 +366,9 @@
         
         const chillMedianValues = chillData.features.map(f => f.properties.first_foliage_chill_median).filter(v => v != null);
         const [chillMin, chillMax] = [Math.min(...chillMedianValues), Math.max(...chillMedianValues)];
+
+        const snowMedianValues = snowData.features.map(f => f.properties.snow_median).filter(v => v != null);
+        const [snowMin, snowMax] = [Math.min(...snowMedianValues), Math.max(...snowMedianValues)];
 
         chillLayer = L.geoJson(chillData, {
             style: f => ({ fillColor: getColor(f.properties.first_foliage_chill_median, chillMin, chillMax, chillColors), weight: 1, opacity: 1, color: 'black', fillOpacity: 0.8 }),
@@ -372,6 +381,10 @@
         freezeLayer = L.geoJson(freezeData, {
             style: f => ({ fillColor: getColor(f.properties.first_hard_freeze_median, freezeMin, freezeMax, freezeColors), weight: 1, opacity: 1, color: 'black', fillOpacity: 0.8 }),
             onEachFeature: onEachFeature, dataType: 'freeze'
+        });
+        snowLayer = L.geoJson(snowData, {
+            style: f => ({ fillColor: getColor(f.properties.snow_median, snowMin, snowMax, snowColors), weight: 1, opacity: 1, color: 'black', fillOpacity: 0.8 }),
+            onEachFeature: onEachFeature, dataType: 'snow'
         });
 
         chillLayer.addTo(map);
@@ -386,9 +399,11 @@
         if (map.hasLayer(frostLayer)) map.removeLayer(frostLayer);
         if (map.hasLayer(freezeLayer)) map.removeLayer(freezeLayer);
         if (map.hasLayer(chillLayer)) map.removeLayer(chillLayer);
+        if (map.hasLayer(snowLayer)) map.removeLayer(snowLayer);
         
         if (currentLayer === 'frost') map.addLayer(frostLayer);
         else if (currentLayer === 'freeze') map.addLayer(freezeLayer);
+        else if (currentLayer === 'snow') map.addLayer(snowLayer);
         else map.addLayer(chillLayer);
         
         legend.update(currentLayer);
