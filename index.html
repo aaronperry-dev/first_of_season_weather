@@ -354,7 +354,7 @@
         fetch('./data/first_frost_climo_counties_neweng.geojson').then(res => res.json()),
         fetch('./data/first_hardfreeze_climo_counties_neweng.geojson').then(res => res.json()),
         fetch('./data/first_fallchill_climo_counties_neweng.geojson').then(res => res.json()),
-        fetch('first_snowfall_climo_counties_neweng.geojson').then(res => res.json())
+        fetch('./data/first_snowfall_climo_counties_neweng.geojson').then(res => res.json())
     ]).then(([frostJson, freezeJson, chillJson, snowJson]) => {
         [frostData, freezeData, chillData, snowData] = [frostJson, freezeJson, chillJson, snowJson];
 
