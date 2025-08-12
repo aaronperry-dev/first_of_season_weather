@@ -160,6 +160,7 @@
         <option value="chill">First Fall Chill Dates</option>
         <option value="frost">First Frost Dates</option>
         <option value="freeze">First Hard Freeze Dates</option>
+		<option value="freeze">First Snowfall Dates</option>
     </select>
 </div>
 
@@ -230,12 +231,14 @@
     const chillColors = ['#ffffe5','#fff7bc','#fee391','#fec44f','#fe9929','#ec7014','#cc4c02','#993404','#662506'].reverse();
     const frostColors = ['#ffffd9','#edf8b1','#c7e9b4','#7fcdbb','#41b6c4','#1d91c0','#225ea8','#253494','#081d58'].reverse();
     const freezeColors = ['#f7fcfd','#e0ecf4','#bfd3e6','#9ebcda','#8c96c6','#8c6bb1','#88419d','#810f7c','#4d004b'].reverse();
+	const snowColors = ['#f7fcfd','#e0ecf4','#bfd3e6','#9ebcda','#8c96c6','#8c6bb1','#88419d','#810f7c','#4d004b'].reverse();
 
     // --- Content Definitions ---
     const layerDescriptions = {
         chill: { title: "First Fall Chill", text: "Median date of the first day where the temperature drops to 45°F or below.<br><br><i>Note: Actual dates can vary within a county due to elevation, proximity to the ocean, and other local conditions.</i>" },
         frost: { title: "First Frost", text: "Median date of the first frost, when temperatures reach 32°F or lower.<br><br><i>Note: Actual dates can vary within a county due to elevation, proximity to the ocean, and other local conditions.</i>" },
-        freeze: { title: "First Hard Freeze", text: "Median date of the first 'hard freeze,' when temperatures reach 29°F or lower.<br><br><i>Note: Actual dates can vary within a county due to elevation, proximity to the ocean, and other local conditions.</i>" }
+        freeze: { title: "First Hard Freeze", text: "Median date of the first 'hard freeze,' when temperatures reach 29°F or lower.<br><br><i>Note: Actual dates can vary within a county due to elevation, proximity to the ocean, and other local conditions.</i>" },
+		freeze: { title: "First Snowfall", text: "Median date of the first snowfall, as measured by the first >=0.1" of snowfall of the season.<br><br><i>Note: Actual dates can vary within a county due to elevation, proximity to the ocean, and other local conditions.</i>" }
     };
 
     // --- Helper Functions ---
